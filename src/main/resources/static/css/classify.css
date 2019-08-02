@@ -1,0 +1,74 @@
+.header ul li:nth-child(1){background: #1239bc;}
+.menu a:nth-child(1){background: #1239bc;}
+.menu a:nth-child(1) em {color: #fff;}
+/*中间内容区*/
+.main{
+	/* width: 88%; */
+	height: 660px;
+	background: #eff4f8;
+	padding-left:30px ;
+	position: absolute;
+	top: 120px;
+	left: 210px;
+	/*display: none;*/
+}
+.main span{
+	display: inline-block;
+	margin: 20px 0;
+	color: #6495bb;
+	font-size: 13px;
+}
+.main span a{
+	color: #6495bb;
+}
+.main li{
+	width: 240px;
+	height: 220px;
+	background: #fff;
+	float: left;
+	margin-right: 20px;
+	margin-bottom: 40px;
+	position: relative;
+}
+
+.main li img{
+	margin:26px 0 20px 50px;
+}
+.main p:nth-of-type(1){
+	position: absolute;
+	top: 70px;
+	left: 106px;
+	font-size: 16px;
+	color: #fff;
+}
+
+.main p:nth-of-type(2){
+	text-align: center;
+	}
+.main li button{
+	border: none;
+	width: 80px;
+	height: 30px;
+	border-radius: 4px;
+	background: #fff;
+	border: 1px solid #97b4ff;
+	color: #2a58f4;
+	margin: 0 10px;
+	cursor: pointer;
+}
+
+.main li:last-child span{
+	display: block;
+	width: 70px;
+	height: 70px;
+	border-radius: 50%;
+	background: #4885e6;
+	margin-top: 75px;
+	margin-left: 80px;
+	text-align: center;
+	line-height: 70px;
+}
+.main li span i{
+	font-size: 40px;
+	color: #fff;
+}

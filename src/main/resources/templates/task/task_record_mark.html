@@ -1,0 +1,135 @@
+<?
+	layout("/inc/win_layout.html",{title:"文档安全检查工具-检查任务标记",htmlType:"index",pageName:"win_index"}){
+?>
+<style>
+    #popBox{
+        display: inline;
+        background-color: #FFFFFF;
+        z-index: 11;
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        margin: auto;
+        overflow-y: hidden;
+        overflow-x: hidden;
+    }
+    #content{
+        margin-bottom: 30px;
+        font-size: 18px;
+        line-height: 30px;
+        width: 760px;
+        height: 336px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        border: 1px solid #ddd;
+        /*padding: 10px 20px;*/
+    }
+    #popBox .content {
+        padding: 10px 20px;
+        overflow: hidden;
+    }
+    #originalLabel{
+        margin-bottom: 4px;
+        font-size: 20px;
+        margin-top: -60px;
+    }
+    #checkLabel{
+        margin-bottom: 4px;
+        font-size: 20px;
+    }
+    #reviewLabel{
+        margin-bottom: 4px;
+        font-size: 20px;
+    }
+    #add2Corpus{
+        margin-bottom: 4px;
+        font-size: 20px;
+    }
+
+</style>
+<div id="popBox">
+    <div class="content">
+        <p id="content"></p>
+        <p>
+            <span id="originalLabel" style="display: inline-block"></span>
+            <span id="checkLabel" style="display: inline-block"></span>
+            <span id="reviewLabel" style="display: inline-block"></span>
+            <span id="add2Corpus" style="display: inline-block;margin-right: 0px;margin-top: -1px;">
+            <input type="checkbox" checked="checked" style="height:16px;width: 27px;" />加入语料库？
+            </span>
+        </p>
+        <form id="recordMark" action="" method="get" style="display: none">
+            <p style="font-size: 20px;margin-top:1px;margin-bottom: 5px">请选择最终的密级？</p>
+        </form>
+    </div>
+
+</div>
+<?
+}
+?>
+
+<script type="text/javascript">
+    var id;
+    $(function() {
+        id = GetRequest().id;
+        getCheckRecordById(id);
+    });
+
+    // 获取请求参数
+    function GetRequest() {
+        var url = location.search; //获取url中"?"符后的字串
+        var theRequest = new Object();
+        if (url.indexOf("?") != -1) {
+            var str = url.substr(1);
+            strs = str.split("&");
+            for(var i = 0; i < strs.length; i ++) {
+                theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);
+            }
+        }
+        return theRequest;
+    }
+
+    // 记录预览
+    function getCheckRecordById(id) {
+        $.ajax({
+            type : "post",
+            url : "/task/getTargetLabelsByRecordId",
+            data : {
+                "id": id,
+            },
+            dataType : "json",
+            success : function(data) {
+                // console.log(data[0].content);
+                $("#content").append("<pre style=\"white-space:pre-wrap;line-height:170%;word-wrap:break-word; margin:10px;font-size: 18px;\">"+ data[0].content + "</pre>");
+                $("#recordMark").attr("style", "display:block");
+
+                var classify = data[0].classify;
+                $("#originalLabel").append("<em style='font-size: 20px;'>原始密级:</em><li style='margin-left: 84px;margin-top: -44px;position: relative'><strong style='position: absolute;top: 24px;left: 22px;font-size: 14px;color: #fff;'>"+data[0].originalLabel+"</strong><img style='margin-left: -8px;z-index: 8' src=\"/img/secret_19.png\"></li>");
+                $("#checkLabel").append("<em style='font-size: 20px;'>检测密级:</em><li style='margin-left: 84px;margin-top: -44px;position: relative'><strong style='position: absolute;top: 24px;left: 22px;font-size: 14px;color: #fff;'>"+data[0].checkLabel+"</strong><img style='margin-left: -8px;z-index: 8' src=\"/img/secret_19.png\"></li>");
+                if(undefined != data[0].reviewLabel) {
+                    $("#reviewLabel").append("<em style='font-size: 20px;'>标注密级:</em><li style='margin-left: 84px;margin-top: -44px;position: relative'><strong style='position: absolute;top: 24px;left: 22px;font-size: 14px;color: #fff;'>"+data[0].reviewLabel+"</strong><img style='margin-left: -8px;z-index: 8' src=\"/img/secret_19.png\"></li>");
+                }
+                $.each(classify, function(i, item){
+                    $("#recordMark").append("<input name='reviewResult' style='height: 20px;width: 30px;margin-top: -10px' type=\"radio\" value=\""+ item +"\" /><i style='font-size: 18px;margin-top: -6px'>"+item+"</i>" );
+                });
+
+            },
+            error : function(data) {
+            }
+        });
+    }
+
+    // 返回回调数据
+    var callbackdata = function () {
+        var data = {
+            reviewResult: $('input[name="reviewResult"]:checked').val(),
+            id: id
+        };
+        return data;
+    }
+
+
+
+</script>

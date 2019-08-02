@@ -1,0 +1,93 @@
+.header ul li:nth-child(4){background: #1239bc;}
+.menu a:nth-child(2){background: #1239bc;}
+.menu a:nth-child(2) em {color: #fff;}
+.nbsy{
+	/* width: 88%; */
+	height:auto;
+	/*height: 700px;*/
+	padding-left:30px ;
+	padding-right:26px ;
+	background: #eff4f8;
+	position: absolute;
+	top: 120px;
+	left: 210px;
+	/*display: none;*/
+}
+.nbsy span{
+	display: inline-block;
+	margin: 20px 0 30px 0;
+	color: #6495bb;
+	font-size: 13px;
+}
+.nbsy span a{
+	color: #6495bb;
+}
+.nbsy p{
+	margin: 24px 0px 12px 0;
+}
+.nbsy input{
+	border: none;
+	width: 70px;
+	height: 30px;
+	border-radius: 4px;
+	background: #fff;
+	border: 1px solid #839afc;
+	color: #31478f;
+	margin-left: 7px;
+	font-size: 12px;
+}
+.nbsy table{
+	/*height: 100%;*/
+	background: #fff;
+	border: 1px solid #ddd;
+	margin-bottom: 10px;
+	padding: 30px 30px;
+	table-layout: fixed;
+	margin-top:-2px;
+}
+.nbsy table th{
+	height: 46px;
+	background: #416df9;
+	font-size: 16px;
+	color: #fff;
+	
+}
+.nbsy table th input,.nbsy table tr input{
+	width: 12px;
+	height: 12px;
+	background: #fff;
+	border: 1px solid #317df5;
+	
+}
+.nbsy table tr{
+	height: 40px;
+	text-align: center;
+	font-size: 14px;
+	/*box-shadow: 1px 1px 4px #f1f1f1;*/
+}
+.nbsy table tr:nth-child(even){
+	background: #efefef;
+}
+.nbsy table tr td{padding: 5px 0;}
+.nbsy table tr td button{
+	background: none;
+	border: none;
+	margin: 3px 10px;
+	font-size: 12px;
+	font-weight: bold;
+	color:#2a58f4 ;
+	cursor: pointer;
+}
+#pageNum{
+    height: 60px;
+    text-align: center;
+    margin-top: -40px;
+  }
+   #pageNum p{display: inline-block;}
+   #pageNum p  a{
+            height: 24px;
+            color: #2249ba;
+            margin: 0 10px;
+       	 }    
+  #pageNum .pageNum_R input{width: 20px;height: 16px;}
+  #pageNum .pageNum_R  a{ width: 20px;height: 16px; border: 1px solid #999; margin-left: 10px;color: #333;}

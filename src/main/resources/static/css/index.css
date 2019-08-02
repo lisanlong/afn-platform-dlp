@@ -1,0 +1,114 @@
+.header h1{
+	margin-left: 60px;
+}
+.statistics{
+	width: 100%;
+	/*height:200px;*/
+	/*background: #10142d;*/
+	/*margin-top: 40px;*/
+	/*padding-left: 150px;*/
+	margin: 20px auto;
+	position: relative;
+	top: 120px;
+	left: 0;
+}
+.statistics .sj{
+	width: 100%;
+	float: left;
+}
+.statistics p,.main p{height: 40px;margin-bottom: 10px;/*background: red;*/margin-left: 3%;}
+.statistics span,.main span{
+	display: inline-block;
+	width: 4px;
+	height: 14px;
+	background: #17d6cb;
+	margin-right: 16px;
+}
+.statistics i,.main i{
+	font-size: 18px;
+	color: #333;
+	line-height: 40px;
+	/*font-weight: 600;*/
+}
+.statistics li a{cursor:default;}
+.statistics li{
+	width: 16%;
+	height: 120px;
+	/*background: #31c1fe;*/
+	border-radius: 6px;
+	float: left;
+	margin-left: 3%;
+	margin-bottom: 30px;
+	box-shadow: 2px 2px 16px #d1d1d1;
+	text-align: center;
+}
+.statistics li:nth-child(1){
+	background: -webkit-linear-gradient(left top, #6984fe, #21b9e5);
+	/* box-shadow: 2px 2px 16px #60ddd2; */
+}
+.statistics li:nth-child(2){
+	background: -webkit-linear-gradient(left top, #ff928b, #ff6e88);
+}
+.statistics li:nth-child(3){
+	background: -webkit-linear-gradient(left top, #0cb7df, #26eda1);
+}
+.statistics li:nth-child(4){
+	background: -webkit-linear-gradient(left top, #807dfd, #f082ee);
+}
+.statistics li h3{
+	font-size: 32px;
+	color: #fff;
+	padding-top: 20px;
+	/*	padding-left: 40px;*/
+	margin-bottom: 4px;
+	letter-spacing:2px
+}
+.statistics li h3 i{
+	font-size: 14px;
+	color: #fff;
+	margin-left: 8px;
+}
+.statistics li h5{
+	font-size: 14px;
+	color: #fff;
+	margin-top: 20px;
+	letter-spacing:4px;
+}
+.main{
+	width: 94%;
+	/*background: #10142d;*/
+	/*overflow:hidden;*/
+	margin: 10px auto;
+	position: relative;
+	top: 140px;
+	left: 0;
+}
+.main ul{
+	width: 100%;
+	/*float: left;*/
+
+}
+/*.main p{*/
+	/*margin-left: -1px;*/
+/*}*/
+.main li{
+	width: 31%;
+	height:410px;
+	float: left;
+	/*overflow: hidden;*/
+	margin-right: 2%;
+	margin-bottom: 50px;
+	box-shadow: 2px 2px 12px #c4d7ff;
+}
+.statistics li:hover{
+	box-shadow: 2px 2px 12px #8f9ffc;
+}
+/*.main li:hover{*/
+	/*box-shadow: 2px 2px 12px #c4d7ff;*/
+	/*!*box-sizing:  border-box;*/
+	/*border: 1px solid #0CB7DF;*!*/
+
+/*}*/
+.statistics li:nth-child(3){
+	background: -webkit-linear-gradient(left top, #0cb7df, #26eda1);
+}

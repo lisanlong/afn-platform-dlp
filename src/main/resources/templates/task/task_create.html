@@ -1,0 +1,481 @@
+<?
+	layout("/inc/layout.html",{title:"文档安全检查工具-任务创建",htmlType:"index",pageName:"home_index"}){
+?>
+
+<link rel="stylesheet" type="text/css" href="/css/task_create.css"/>
+<link rel="stylesheet" type="text/css" href="/js/bootstrap3/css/bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="/js/bootstrap3/css/font-awesome.css" />
+
+<div class="exhibit">
+    <div class="menu">
+        <!--<a href="task_source.html">
+            <img src="/img/task_03.png">
+            <em>数据源管理</em>
+        </a>-->
+        <a href="task_create.html">
+            <img src="/img/task_05.png">
+            <em>创建任务</em>
+        </a>
+        <a href="task_list.html">
+            <img src="/img/task_08.png">
+            <em>任务列表</em>
+        </a>
+        <a href="task_warn.html">
+            <img src="/img/task_09.png">
+            <em>任务预警</em>
+        </a>
+    </div>
+
+
+    <!--内容区-->
+    <div class="main">
+        <span style="display: inline-block;	margin: 20px 0 20px 0;color: #6495bb;font-size: 13px;"><a style="text-decoration: none" href="../home/index.html">首页 ></a><a style="text-decoration: none" href="task_source.html">任务管理 </a> >  创建任务  </span>
+        <div class="model">
+            <!--<label>任务名称:</label><input style="width: 390px;height: 28px; border: 1px solid #2772d6;" type="text" name="name" value="20190620-涉密文件检测任务-王工"><br/>-->
+            <label>任务名称:</label><input style="width: 400px;height: 28px; border: 1px solid #839afc;" type="text" id="name" name="name" value=""><br/>
+            <label style="vertical-align:top;">任务描述:</label><textarea id="detail" name="detail" style="width: 400px;height: 100px; border: 1px solid #839afc; overflow:hidden;overflow-y:auto;resize:none;margin-bottom: 30px;"></textarea><br/>
+            <div id="datasource" style="margin-bottom: -100px;">
+                <label>数据源:</label>
+                <select id="datasourceId" style="border: 1px solid #839afc;">
+                    <option value="0">--请选择--</option>
+                    <!--<option value="1">V1.0</option>
+                    <option value="2">V2.0</option>-->
+                </select>
+            </div>
+
+            <div id="zipFile" style="display: none">
+                <label>待检测文件:</label>
+                <input type="button" class="layui-btn" id="uploadFile" value="选择文件"/>
+                <span id="uploadInformation" style="position: absolute; margin-top: 18px;margin-left: 41px;"></span>
+                <div class="help-tip" style="position: absolute;top: 299px;left: 267px;">
+                    <p>仅支持zip格式,请直接将待检测密级的文件夹进行打包,例：xxx.zip/公开/xxx.txt</p>
+                </div>
+                <!--<div id="uploadFileInfo" style="display: none;">
+                    <p>原文件名称：<input  id="originalFilename" type="text" readonly="readonly" /></p>
+                    <p>可检测文件：  <input id="checkRange" type="text" readonly="readonly" /></p>
+                </div>-->
+            </div><br>
+            <div id="directoryFile" style="display: none">
+                <label>待检测文件夹:</label>
+                <input οninput="getTotalCheckFile()" type="text" style="width: 400px;height: 28px; border: 1px solid #2772d6;" id="uploadDirectory" placeholder="请输入待检测文件夹"/>
+                    <div class="help-tip" style="position: absolute;top: 312px;left: 575px;">
+                                <p>请输入待检测密级的文件夹的上层目录,例：D:/123/公开/xxx.txt, 输入公开密级的上层文件夹D:/123</p>
+                    </div>
+                <div style="margin-top: -8px;">
+                    <label>定期执行:</label>
+                    <div id="checkRunByCron" style="margin-top: -61px;margin-left: 134px;width:30%;font-size: 17px">
+                        <input type="radio" name="needCron" value="1"/>是
+                        <input type="radio" name="needCron" value="0" checked="checked"/>否
+                    </div>
+                    <input id="cronExpression" type="hidden" value="0 15 10 * * ? 2099">
+                    <div class="container" style="display:none;">
+                        <form role="form" class="form-inline">
+                            <div class="form-group">
+                                <!--<label for="cron">Cron</label>-->
+                                <input id="cron" class="form-control" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div><br>
+            <div id="checkRangeThis" style="display: none;margin-bottom: 40px;">
+                <label>本次检测范围:</label>
+                <ul id="check_scope" style="margin-left: 130px;margin-top: -86px;">
+
+                </ul><br>
+
+            <input type="hidden" id="filePath" name="filePath" value=""/>
+            <input type="hidden" id="totalCheckFile" name="totalCheckFile" value=""/>
+
+            </div><br><br>
+            <!--<input name="filePath" style="width: 200px;height: 28px;border: 1px solid #2772d6;" type="text"> <input id="fileImage" type="file"><br/>-->
+            <br><div id="modelVersion">
+                <label style="display: inline-block">训练模型版本:</label>
+                <select id="modelId" style="border: 1px solid #839afc;">
+                    <option value="0">--请选择--</option>
+                    <!--<option value="1">V1.0</option>
+                    <option value="2">V2.0</option>-->
+                </select><br>
+            </div><br>
+            <div>
+            <label>模型检测范围:</label>
+            <ul id="test_scope" style="margin-left: 130px;margin-top: -86px;">
+                <!--<li><strong>秘密</strong><img src="/img/secret_19.png"></li>
+                <li><strong>绝密</strong><img src="/img/secret_19.png"></li>-->
+            </ul><br>
+            </div>
+            <!--<label>创建人:</label><i>测试</i><br>
+            <label>创时间:</label><i>2019-06-25 20:12:27</i>-->
+            <button id="submitBtn" onclick="saveTestTask()">保存任务</button>
+        </div>
+    </div>
+</div>
+<?
+}
+?>
+
+<script type="text/javascript" src="/js/cronGen.js"></script>
+<script type="text/javascript" src="/js/bootstrap3/js/bootstrap.js"></script>
+
+<script>
+    $(function(){
+        $("#datasourceId").html('');
+        getAllModel();
+        getAllDatasources();
+        $("#cron").cronGen();
+    })
+
+
+    $("input[type='radio']").click(function(){
+        var val = $("input:radio[name='needCron']:checked").val();
+        if(val === '1') {
+            $(".container").attr("style", "display:block;margin-top: -25px;margin-left: 188px;width:24%");
+        } else {
+            $(".container").attr("style", "display:none");
+            $("#cronExpression").val("0 15 10 * * ? 2099");
+        }
+    });
+
+    // 获取所有的数据源
+    function getAllDatasources() {
+        $.ajax({
+            type: "POST",
+            url: "/task/getAllDatasources",
+            async : false,
+            datatype:'json',
+            success : function(list) {
+                if(list === '0') {
+                    alert("数据源列表为空，请先配置数据源!!!");
+                } else {
+                    var data = $.parseJSON(list);
+                    $("#datasourceId").append("<option value=\"0\">--请选择数据源--</option>");
+                    $.each(data, function(i, item){
+                        $("#datasourceId").append("<option value=\""+ item.key +"\">"+item.value+"</option>");
+                    });
+                    listenDatasourceIdChange();
+                }
+            },
+            error : function(data) {
+                alert("请求失败, 请刷新重试");
+            }
+        });
+    }
+
+    // 检测数据源的变化
+    $("#datasourceId").change(function(){
+        $("#uploadFileInfo").attr("style", "display:none");
+        $("#checkRangeThis").attr("style", "display:none");
+        $("#uploadDirectory").val("");
+        $("input:radio[name='needCron']:checked").val("0");
+        // $("#checkRunByCron").attr("style","display:none");
+        var id = $("#datasourceId").children('option:selected').val();
+        if(id != '0') {
+            $.ajax({
+                type: "POST",
+                url: "/task/getSourceTypeBySourceId",
+                data:{"id":id},
+                async : false,
+                datatype:'json',
+                success : function(version) {
+                    console.log(version);
+                    if(version === "0") {
+                        $("#zipFile").attr("style", "display: block;margin-bottom:-70px;");
+                        $("#datasource").attr("style", "margin-bottom：30px;");
+                        $("#directoryFile").attr("style", "display: none");
+                    }
+                    if(version === "1") {
+                        // $("#checkRunByCron").attr("style","display: block;margin-top: -61px;margin-left: 134px;width:30%;font-size: 17px");
+                        $("#directoryFile").attr("style", "display: block;margin-bottom:-56px;");
+                        $("#datasource").attr("style", "margin-bottom：30px;");
+                        $("#directoryFile").val("");
+                        $("#zipFile").attr("style", "display: none");
+                    }
+                },
+                error : function(data) {
+                    alert("请求失败, 请刷新重试");
+                }
+            });
+        }
+
+    });
+
+    function listenDatasourceIdChange() {
+        var version = $("#datasourceId").children('option:selected').val();
+        if(version === "-4") {
+            $("#zipFile").attr("style", "display: block");
+            $("#directoryFile").attr("style", "display: none");
+        }
+        if(version === "-5") {
+            $("#directoryFile").attr("style", "display: block");
+            $("#zipFile").attr("style", "display: none");
+        }
+    }
+
+    // 文件上传
+    layui.use('upload', function(){
+        var $ = layui.jquery
+            ,upload = layui.upload
+            ,element=layui.element;
+        var layero;
+        upload.render({ //允许上传的文件后缀
+            elem: '#uploadFile'
+            ,url: '/task/upload'
+            ,accept: 'file' //普通文件
+            ,exts: 'zip' //只允许上传压缩文件
+            ,auto: true
+            ,xhr:function dlxhr(){}
+            ,before: function(){
+                this.data={'modelId':$("#modelId").val()};
+                layero = layer.load();
+            }
+            ,done: function(res){
+                layer.close(layero);
+                console.log(res.checkRange + " <=======================");
+                if(res.code > 0) {
+                    if(res.checkRange === "") {
+                        layer.alert("待检测的文件数为 0, 请调整待检测文件的结构!!!")
+                    } else {
+                        $("#tempProgress").attr("style", "display:none");
+                        $("#filePath").val(res.fileUrl);
+                        $("#totalCheckFile").val(res.totalCheckNum);
+                        $("#originalFilename").val(res.originalFilename);
+                       /* $("#fileType").val(res.fileType);
+                        $("#fileSize").val(res.fileSize);
+                        $("#fileNum").val(res.totalCheckNum);*/
+
+                        $("#checkRange").val(res.checkRange);
+
+                        //
+                        $("#checkRangeThis").attr("style","display:block;margin-top: 32px;");
+                        console.log($.parseJSON(JSON.stringify(res.checkRange)) + " res.checkRange");
+                        var data = $.parseJSON(res.checkRange);
+                        $.each(data, function(i, item){
+                            $("#check_scope").append("<li><strong>"+item+"</strong><img src=\"/img/secret_19.png\"></li>");
+                        });
+
+                        $("#uploadInformation").text(res.originalFilename + "." + res.fileType);
+                        // $("#uploadInformation").attr("style","font-size:20px");
+
+
+                        // $("#uploadFileInfo").attr("style", "display:block");
+                        layer.msg("上传成功");
+
+                    }
+                    $(".version").attr("style","display:block");
+                } else{
+                    layer.close(layero);
+                    layer.msg("上传失败");
+                }
+            }
+        });
+
+    });
+
+    // 监听上传文件夹
+    $("#uploadDirectory").change(function(){
+        var uploadDirectory = $("#uploadDirectory").val();
+        console.log(uploadDirectory);
+        $.ajax({
+            type: "POST",
+            url: "/task/getTotalCheckFile",
+            data: {
+                'uploadDirectory':uploadDirectory,
+                'modelId':$("#modelId").val()
+            },
+            async : false,
+            datatype:'json',
+            success : function(res) {
+                if(res[0].errMsg) {
+                    // layer.msg(res[0].code);
+                    layer.alert("以下的密级不在本次的检测范围: " + res[0].errMsg + "!!!");
+                }
+                $("#totalCheckFile").val(res[0].code);
+                $("#checkRangeThis").attr("style","display:block;margin-top:68px");
+                console.log($.parseJSON(JSON.stringify(res[0].checkRange)) + " res.checkRange");
+                var data = $.parseJSON(res[0].checkRange);
+                console.log(data + " ::: data");
+                $.each(data, function(i, item){
+                    $("#check_scope").append("<li><strong>"+item+"</strong><img src=\"/img/secret_19.png\"></li>");
+                });
+            },
+            error : function(data) {
+                alert("请求失败, 请刷新重试");
+            }
+        });
+
+
+    });
+
+   /* // 监听上传文件夹
+    function checkUploadDirectory() {
+        var uploadDirectory = $("#uploadDirectory").val();
+        console.log(uploadDirectory);
+        $.ajax({
+            type: "POST",
+            url: "/task/getTotalCheckFile",
+            data: {
+                'uploadDirectory':uploadDirectory,
+                'modelId':$("#modelId").val()
+            },
+            async : false,
+            datatype:'json',
+            success : function(res) {
+                if(res[0].errMsg) {
+                    // layer.msg(res[0].code);
+                    layer.alert("以下的密级不在本次的检测范围: " + res[0].errMsg + "!!!");
+                }
+                $("#totalCheckFile").val(res[0].code);
+
+                $("#checkRangeThis").attr("style","display:block;margin-top:21px");
+                console.log($.parseJSON(JSON.stringify(res[0].checkRange)) + " res.checkRange");
+                var data = $.parseJSON(res[0].checkRange);
+                console.log(data + " ::: data");
+                $.each(data, function(i, item){
+                    $("#check_scope").append("<li><strong>"+item+"</strong><img src=\"/img/secret_19.png\"></li>");
+                });
+            },
+            error : function(data) {
+                alert("请求失败, 请刷新重试");
+            }
+        });
+    }*/
+
+
+    // 获取所有的检测模型
+    function getAllModel() {
+        $.ajax({
+            type: "POST",
+            url: "/onLineTest/getAllModel",
+            async : false,
+            datatype:'json',
+            success : function(list) {
+                var data = $.parseJSON(list);
+                $.each(data, function(i, item){
+                    $("#modelId").append("<option value=\""+ item.value +"\">V"+item.key+"</option>");
+                    if(i == data.length - 1) {
+                        $("#modelId").val(item.value);
+                    }
+                });
+                if($("#modelId").children('option:selected').val() != '0') {
+                    getSelectedLabels();
+                }
+            },
+            error : function(data) {
+                alert("请求失败, 请刷新重试");
+            }
+        });
+    };
+
+    function getSelectedLabels() {
+        var version = $("#modelId").val();
+        console.log("----------------> " + version);
+        $("#test_scope").html("");
+        $.ajax({
+            type: "POST",
+            url: "/onLineTest/getSelectedLabels",
+            data:{"id":version},
+            async : false,
+            datatype:'json',
+            success : function(list) {
+                var data = $.parseJSON(list);
+                console.log(data + ":data");
+                $.each(data, function(i, item){
+                    $("#test_scope").append("<li><strong>"+item+"</strong><img src=\"/img/secret_19.png\"></li>");
+                });
+            },
+            error : function(data) {
+                alert("请求失败, 请刷新重试");
+            }
+        });
+    }
+
+    $("#modelId").change(function(){
+        var version = $("#modelId").val();
+        if($("#datasourceId").val() != "0") {
+            layer.msg("训练模型更改请重新选择数据源!!!")
+        }
+        // 重置数据源
+        $("#datasourceId").val("0");
+        $("#uploadFileInfo").attr("style", "display:none");
+        $("#zipFile").attr("style", "display: none");
+        $("#directoryFile").attr("style", "display: none");
+        $("#checkRangeThis").attr("style", "display: none");
+        $("#filePath").val("");
+        console.log("----------------> " + version);
+        if('0' != version) {
+            $("#test_scope").html("");
+            $.ajax({
+                type: "POST",
+                url: "/onLineTest/getSelectedLabels",
+                data:{"id":version},
+                async : false,
+                datatype:'json',
+                success : function(list) {
+                    var data = $.parseJSON(list);
+                    $.each(data, function(i, item){
+                        $("#test_scope").append("<li><strong>"+item+"</strong><img src=\"/img/secret_19.png\"></li>");
+                    });
+                    // checkUploadDirectory();
+                },
+                error : function(data) {
+                    alert("请求失败, 请刷新重试");
+                }
+            });
+        } else {
+            $("#test_scope").html("");
+        }
+
+
+    });
+
+
+
+    function saveTestTask() {
+        if ($.trim($("#name").val()).length < 1) {
+            layer.msg('测试任务名称不能为空');
+            return null;
+        }
+        console.log($("#totalCheckFile").val() + " $(\"#totalCheckFile\").val()");
+        if ($.trim($("#totalCheckFile").val()) == 0) {
+            layer.msg('测试文件不能为空');
+            return null;
+        }
+        // console.log($("#uploadDirectory").val() + "<=================");
+        if($.trim($("#uploadDirectory").val()).length > 0) {
+            $("#filePath").val($("#uploadDirectory").val());
+        }
+        var wait = layer.load();
+        $.ajax({
+            type : "post",
+            url : "/task/addOrEditTask",
+            data : {
+                "name" :$.trim($("#name").val()),
+                "detail" :$.trim($("#detail").val()),
+                "datasourceId" :$.trim($("#datasourceId").val()),
+                "filePath" :$.trim($("#filePath").val()),
+                "modelId" :$.trim($("#modelId").val()),
+                "cronExpression" : $.trim($("#cronExpression").val()),
+                "totalCheckFile":$("#totalCheckFile").val(),
+            },
+            dataType : "json",
+            async : true,
+            success : function(data) {
+                layer.close(wait);
+                if(data[0].type=='false'){
+                    layer.msg('名称重复');
+                }else{
+                    parent.layer.msg('保存成功');
+                    /* var index = parent.layer.getFrameIndex(window.name);
+                     parent.layer.close(index);*/
+                    window.location.href = "/task/task_list.html";
+                }
+            },
+            error : function(data) {
+                layer.close(wait);
+                alert("请求失败");
+            }
+        });
+    }
+
+</script>
+

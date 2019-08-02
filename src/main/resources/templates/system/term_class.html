@@ -1,0 +1,144 @@
+<?
+layout("/inc/win_layout.html",{title:"文档安全检查工具-密级管理",htmlType:"index",pageName:"win_index"}){
+?>
+<link rel="stylesheet" type="text/css" href="/css/term_class.css"/>
+
+<div class="nbsy">
+    <p  class="right" href="#">
+        <input type="button" onclick="addOrEditTermClass(0)" value="新增">
+        <input type="button" onclick="delTerm(checkVals())" value="批量删除">
+    </p>
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <thead class="table_head">
+        <tr>
+            <th width="5%"><input type="checkbox" class="check check-all"></th>
+            <th width="5%">序号</th>
+            <th width="15%">名称</th>
+            <th width="15%">描述</th>
+            <th width="20%">可操作</th>
+        </tr>
+        </thead>
+        <tbody class="table_body" id="termList">
+
+        </tbody>
+    </table>
+    <div id="page" style="text-align: center;"></div>
+    <div id="dataNull" style="height: 90px; line-height: 50px;" align="center"></div>
+</div>
+<?
+}
+?>
+
+<script type="text/javascript">
+    var curr = 1;
+    $(function(){
+        getTermClassList();
+    })
+    function getTermClassList(curr){
+        $.ajax({
+            type : "post",
+            url : "/getTermClassList",
+            data : {
+                "pageNum":curr||1,
+                "pageSize":5
+            },
+            dataType : "json",
+            success : function(data) {
+                $('.table_head').find('.check-all').each(function(){
+                    this.checked = false;
+                });
+                if(data[0].data.length>0){
+                    $("#dataNull").html("");
+                }else{
+                    $("#dataNull").html("<span style='font-size: 15px;'>暂无数据</span>");
+                }
+                var str = '';
+                for(var i=0;i<data[0].data.length;i++){
+                    str+='<tr><td><input type="checkbox" class="check check-one" value="'+data[0].data[i].id+'"></td>'
+                        +'<td>'+(((curr||1)-1)*5+i+1)+'</td>'
+                        +'<td>'+data[0].data[i].name+'</td>'
+                        +'<td>'+data[0].data[i].detail+'</td>'
+                        +'<td><button onclick="addOrEditTermClass('+data[0].data[i].id+')">编辑</button><button onclick="delTerm('+data[0].data[i].id+')">删除</button></td></tr>';
+                }
+                $('#termList').html(str);
+                laypage({
+                    cont : "page", //容器。值支持id名、原生dom对象，jquery对象,
+                    pages : data[0].count, //总页数
+                    skip : false, //是否开启跳页
+                    curr : curr || 1,
+                    first: '首页',
+                    last: '尾页',
+                    skin : 'molv', //加载内置皮肤，也可以直接赋值16进制颜色值，如:#c00
+                    groups : 5,//连续显示分页数
+                    jump : function(obj, first) { //触发分页后的回调
+                        if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                            getTermClassList(obj.curr);
+                            curr=obj.curr;
+                        }
+                    }
+                });
+            },
+            error : function(data) {
+                alert("请求失败");
+            }
+        });
+    }
+    function addOrEditTermClass(id){
+        layer.open({
+            type : 2,
+            area : [ '550px', '350px' ],
+            scrollbar: false,
+            //shadeClose: true,
+            fix : true, //不固定
+            title : id==0?'新增术语分类':'编辑术语分类',
+            //skin: 'layui-layer-rim', //加上边框
+            btn: ['保存 ', '关闭'],
+            content : ["term_class_add_edit.html?id="+id,'no'],
+            yes: function(index,layer){
+                //得到iframe页的窗口对象
+                var iframeWin =  window.parent.window[name].window[layer.find('iframe')[0]['name']];
+                iframeWin.Page();
+            },
+            cancel : function(index) {
+            }
+
+        });
+    }
+    function delTerm(id){
+        if(id==''){
+            layer.msg('请先选择');
+            return;
+        }
+        layer.msg('确定删除吗', {
+            time: 20000,
+            btn: ['确定', '取消']
+            ,yes:function(){
+                $.ajax({
+                    type : "post",
+                    url : "/delTermClass",
+                    data : {
+                        id: id,
+                    },
+                    dataType : "json",
+                    success : function(data) {
+                        if(data[0].description!=null&&data[0].description!=""){
+                            layer.msg(data[0].description);
+                        }else{
+                            layer.msg("删除成功");
+                            getTermClassList();
+                        }
+                    },
+                    error : function(data) {
+                        alert("请求失败");
+                    }
+                });
+            }
+        });
+    }
+
+    function Page(){
+        var index = parent.layer.getFrameIndex(window.name);
+        window.parent.getTermClassAll();
+        parent.layer.close(index);
+    }
+</script>

@@ -1,0 +1,163 @@
+<?
+	layout("/inc/layout.html",{title:"文档安全检查工具-数据源管理",htmlType:"index",pageName:"home_index"}){
+?>
+<link rel="stylesheet" type="text/css" href="/css/data_source.css"/>
+<div class="exhibit">
+    <div class="menu left">
+        <a href="term.html">
+            <img src="/img/secret_06.png">
+            <em>专业术语管理</em>
+        </a>
+        <a href="task_source.html">
+            <img src="/img/task_02.png">
+            <em>数据源管理</em>
+        </a>
+        <a href="user.html">
+            <img src="/img/system_02.png">
+            <em>用户管理</em>
+        </a>
+        <a href="department.html">
+            <img src="/img/system_06.png">
+            <em>部门管理</em>
+        </a>
+        <a href="log.html">
+            <img src="/img/system_08.png">
+            <em>日志管理</em>
+        </a>
+    </div>
+
+    <div class="nbsy">
+        <span><a href="../home/index.html"> 首页 ></a><a href="term.html">系统配置 </a>  >  数据源管理  </span>
+        <p  class="right" href="#">
+            <input type="button" value="添加" onclick="addOrEditDataSource()">
+            <input type="button" value="批量删除" onclick="delDataSource(checkVals())">
+        </p>
+        <table width="100%" cellspacing="0" cellpadding="0">
+            <thead class="table_head">
+                <th width="5%"><input type="checkbox" class="check check-all"></th>
+                <th width="5%">序号</th>
+                <th width="15%">数据源名称</th>
+                <th width="10%">类型</th>
+                <th width="10%">状态</th>
+                <th width="15%">创建人</th>
+                <th width="15%"> 创建时间</th>
+                <th width="20%">操作栏</th>
+            </thead>
+            <tbody class="table_body" id="dataSourceList">
+
+            </tbody>
+        </table>
+        <div id="page" style="text-align: center;"></div>
+        <div id="dataNull" style="height: 90px; line-height: 50px;" align="center"></div>
+    </div>
+</div>
+<?
+}
+?>
+<script>
+    var curr = 1;
+    $(function(){
+        getDataSourceList();
+    })
+    function getDataSourceList(curr){
+        $.ajax({
+            type : "post",
+            url : "/task/getDataSourceList",
+            data : {
+                "pageNum":curr||1,
+                "pageSize":10
+            },
+            dataType : "json",
+            success : function(data) {
+                if(data[0].data.length>0){
+                    $("#dataNull").html("");
+                }else{
+                    $("#dataNull").html("<span style='font-size: 15px;'>暂无数据</span>");
+                }
+                var str = '';
+                for(var i=0;i<data[0].data.length;i++){
+                    str+='<tr><td><input type="checkbox" class="check check-one" value="'+data[0].data[i].id+'"></td>'
+                        +'<td>'+(((curr||1)-1)*10+i+1)+'</td>'
+                        +'<td>'+data[0].data[i].name+'</td>'
+                        +'<td>'+data[0].data[i].sourceType+'</td>'
+                        +'<td>'+(data[0].data[i].isStoped==0?'启用':'禁用')+'</td>'
+                        +'<td>'+data[0].data[i].createUser+'</td>'
+                        +'<td>'+data[0].data[i].createTime+'</td>'
+                        +'<td><button onclick="addOrEditDataSource('+data[0].data[i].id+')">编辑</button><button onclick="delDataSource('+data[0].data[i].id+')">删除</button></td></tr>';
+                }
+                $('#dataSourceList').html(str);
+                laypage({
+                    cont : "page", //容器。值支持id名、原生dom对象，jquery对象,
+                    pages : data[0].count, //总页数
+                    skip : false, //是否开启跳页
+                    curr : curr || 1,
+                    first: '首页',
+                    last: '尾页',
+                    skin : 'molv', //加载内置皮肤，也可以直接赋值16进制颜色值，如:#c00
+                    groups : 5,//连续显示分页数
+                    jump : function(obj, first) { //触发分页后的回调
+                        if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                            getDataSourceList(obj.curr);
+                            curr=obj.curr;
+                        }
+                    }
+                });
+            },
+            error : function(data) {
+                alert("请求失败");
+            }
+        });
+    }
+    function addOrEditDataSource(id){
+        console.log(id == undefined + " id status");
+        layer.open({
+            type : 2,
+            area : [ '500px', '350px' ],
+            scrollbar: true,
+            shadeClose: true,
+            fix : true, //不固定
+            title : id==undefined?'新增数据源':'编辑数据源',
+            //skin: 'layui-layer-rim', //加上边框
+            btn: ['保存 ', '关闭'],
+            content : ["/task/data_source_add_edit.html?id="+id,'no'],
+            yes: function(index,layer){
+                //得到iframe页的窗口对象
+                var iframeWin = parent.window[layer.find('iframe')[0]['name']];
+                iframeWin.Page();
+            },
+            cancel : function(index) {
+            }
+        });
+    }
+    function delDataSource(id){
+        if(id==''){
+            layer.msg('请先选择');
+            return;
+        }
+        layer.msg('确定删除吗', {
+            time: 20000,
+            btn: ['确定', '取消']
+            ,yes:function(){
+                $.ajax({
+                    type : "post",
+                    url : "/task/delDataSource",
+                    data : {
+                        id: id,
+                    },
+                    dataType : "json",
+                    success : function(data) {
+                        if(data[0].code === '1') {
+                            layer.msg("删除成功");
+                        } else {
+                            layer.msg("删除失败，请联系管理员!!!");
+                        }
+                        getDataSourceList();
+                    },
+                    error : function(data) {
+                        layer.msg("删除失败，请联系管理员!!!");
+                    }
+                });
+            }
+        });
+    }
+</script>

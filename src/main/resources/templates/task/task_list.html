@@ -1,0 +1,316 @@
+<?
+	layout("/inc/layout.html",{title:"文档安全检查工具-任务列表",htmlType:"index",pageName:"home_index"}){
+?>
+<link rel="stylesheet" type="text/css" href="/css/task_list.css"/>
+
+<div class="exhibit">
+    <div class="menu left">
+        <!--<a href="task_source.html">
+            <img src="/img/task_03.png">
+            <em>数据源管理</em>
+        </a>-->
+        <a href="task_create.html">
+            <img src="/img/task_06.png">
+            <em>创建任务</em>
+        </a>
+        <a href="task_list.html.html">
+            <img src="/img/task_07.png">
+            <em>任务列表</em>
+        </a>
+        <a href="task_warn.html">
+            <img src="/img/task_09.png">
+            <em>任务预警</em>
+        </a>
+    </div>
+
+    <div class="nbsy">
+        <span><a href="../home/index.html">首页 ></a><a href="task_source.html">任务管理 </a> >  任务列表  </span>
+        <p  class="right" href="#">
+            <!--<input type="button" value="批量启动" onclick="startCheckTask(checkVals())">
+            <input type="button" value="批量停止" onclick="stopCheckTask(checkVals())">-->
+            <input type="button" value="批量删除" onclick="delCheckTask(checkVals())">
+        </p>
+        <div id="downloadFormDiv"></div>
+        <table width="100%" cellspacing="0" cellpadding="0">
+            <thead class="table_head">
+            <th width="5%"><input type="checkbox" class="check check-all"></th>
+            <th width="5%">序号</th>
+            <th width="15%">任务名称</th>
+            <th width="15%">关联数据源</th>
+            <th width="10%">处理进度</th>
+            <th width="15%">状态</th>
+            <th width="15%"> 创建时间</th>
+            <th width="20%">操作栏</th>
+            </thead>
+            <tbody class="table_body" id="taskList">
+
+            </tbody>
+        </table>
+        <div id="page" style="text-align: center;"></div>
+        <div id="dataNull" style="height: 90px; line-height: 50px;" align="center"></div>
+
+    </div>
+</div>
+<?
+}
+?>
+
+
+<script>
+    var curr = 1;
+    $(function(){
+        getTaskList();
+    });
+
+    function getTaskList(curr){
+        var refreshFlag = false;
+       /* if(refreshFlag) {
+            return false;
+        }*/
+        $.ajax({
+            type : "post",
+            url : "/task/getTaskList",
+            data : {
+                "pageNum":curr||1,
+                "pageSize":10
+            },
+            dataType : "json",
+            success : function(data) {
+                if(data[0].data.length>0){
+                    $("#dataNull").html("");
+                }else{
+                    $("#dataNull").html("<span style='font-size: 15px;'>暂无数据</span>");
+                }
+                var str = '';
+                for(var i=0;i<data[0].data.length;i++){
+                    str+='<tr><td><input type="checkbox" class="check check-one" value="'+data[0].data[i].id+'"></td>'
+                        +'<td>'+(((curr||1)-1)*10+i+1)+'</td>'
+                        +'<td>'+data[0].data[i].name+'</td>'
+                        +'<td>'+data[0].data[i].sourceType+'</td>'
+                        +'<td>'+data[0].data[i].checkProcess+'</td>'
+                        +'<td>'+data[0].data[i].taskStatus+'</td>'
+                        +'<td>'+data[0].data[i].createTime+'</td></tr>';
+                }
+                $('#taskList').html(str);
+                laypage({
+                    cont : "page", //容器。值支持id名、原生dom对象，jquery对象,
+                    pages : data[0].count, //总页数
+                    skip : false, //是否开启跳页
+                    curr : curr || 1,
+                    first: '首页',
+                    last: '尾页',
+                    skin : 'molv', //加载内置皮肤，也可以直接赋值16进制颜色值，如:#c00
+                    groups : 5,//连续显示分页数
+                    jump : function(obj, first) { //触发分页后的回调
+                        if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                            getTaskList(obj.curr);
+                            curr=obj.curr;
+                        }
+                    }
+                });
+
+                // 动态显示操作栏
+                $("#taskList tr").each(function(){
+                    //使用children（）定位到<tr></tr>中的指定<td></td>
+                    var valueTd = $(this).children("td").eq(5).text();
+                    var id = $(this).children("td").children("input").val();
+                    // console.log(valueTd + "<--------------> " + id);
+                    if("未开始" === valueTd || "暂停" == valueTd) {
+                        $(this).append('<td>' +
+                            '<button onclick="startCheckTask('+id+')">启动</button>' +
+                            '<button onclick="delCheckTask('+id+')">删除</button>' +
+                            '</td>');
+                    } else if("检查中" === valueTd) {
+                        $(this).append('<td>' +
+                            '<button onclick="stopCheckTask('+id+')">停止</button>' +
+                            '<button onclick="delCheckTask('+id+')">删除</button>' +
+                            '</td>');
+                    } else {
+                        $(this).append('<td>' +
+                            '<button onclick="viewResult('+id+')">查看结果</button>' +
+                            '<button onclick="downloadResult('+id+')">下载</button>' +
+                            '<button onclick="downloadReport('+id+')">报告</button>' +
+                            '<button onclick="delCheckTask('+id+')">删除</button>' +
+                            '</td>');
+                    }
+
+                    /**
+                     * $(this).append('<td>' +
+                     '<button onclick="startCheckTask('+id+')">启动</button>' +
+                     '<button onclick="stopCheckTask('+id+')">停止</button>' +
+                     '<button onclick="delCheckTask('+id+')">删除</button>' +
+                     '<button onclick="foreResult('+id+')">预测结果</button>' +
+                     '<button onclick="checkResult('+id+')">校核结果</button>' +
+                     '</td>');
+                     */
+                });
+
+
+
+                // 定时刷新界面
+                $("#taskList tr").each(function(){
+                    var valueTd = $(this).children("td").eq(5).text();
+                    var processTd = $(this).children("td").eq(4).text();
+                    console.log(valueTd + " ============ " + processTd);
+                    if("检查中" === valueTd && processTd != "0/0") {
+                       refreshFlag = true;
+                       return false;
+                    }
+
+                    if(refreshFlag && valueTd === "检查完成") {
+                        layer.msg("检查完成");
+                    }
+
+                });
+                if(refreshFlag) {
+                    setTimeout(getTaskList, 5000);
+                }
+
+
+            },
+            error : function(data) {
+                alert("请求失败");
+            }
+        });
+    }
+
+    function delCheckTask(id){
+        if(id==''){
+            layer.msg('请先选择');
+            return;
+        }
+        layer.msg('确定删除吗', {
+            time: 20000,
+            btn: ['确定', '取消']
+            ,yes:function(){
+                var wait = layer.load();
+                $.ajax({
+                    type : "post",
+                    url : "/task/delCheckTask",
+                    data : {
+                        id: id,
+                    },
+                    dataType : "json",
+                    success : function(data) {
+                        layer.close(wait);
+                        if(data[0].code === '1') {
+                            layer.msg("删除成功");
+                        } else {
+                            layer.msg("删除失败，请联系管理员!!!");
+                        }
+                        getTaskList();
+                    },
+                    error : function(data) {
+                        layer.close(wait);
+                        layer.msg("删除失败，请联系管理员!!!");
+                    }
+                });
+            }
+        });
+    }
+
+    function downloadResult(id){
+        //构造表单
+        var formHtml = '<form id="downForm" method="post" action="/task/downloadResult">' +
+            '<input type="hidden" name="id" value="'+id+'"/>'+
+            '</form>';
+        //填充表单
+        $("#downloadFormDiv").html(formHtml);
+        //提交表单
+        $("#downForm").submit();
+        //移除表单
+        $("#downloadFormDiv").html("");
+
+    }
+
+
+    // 下载 word 报告
+    function downloadReport(id){
+
+        //构造表单
+        var formHtml = '<form id="downForm" method="post" action="/task/downloadReport">' +
+            '<input type="hidden" name="id" value="'+id+'"/>'+
+            '</form>';
+        //填充表单
+        $("#downloadFormDiv").html(formHtml);
+        //提交表单
+        $("#downForm").submit();
+        //移除表单
+        $("#downloadFormDiv").html("");
+
+    }
+
+    // 启动任务
+    function startCheckTask(id) {
+        if(id==''){
+            layer.msg('请先选择');
+            return;
+        }
+        layer.msg('确定启动吗', {
+            time: 20000,
+            btn: ['确定', '取消']
+            ,yes:function(){
+                $.ajax({
+                    type : "post",
+                    url : "/task/startCheckTask",
+                    data : {
+                        id: id,
+                    },
+                    dataType : "json",
+                    success : function(data) {
+                        if(data[0].code === '1') {
+                            // layer.close(loadLayer);
+                            sleep(1000);
+                            layer.msg("启动成功");
+                        } else {
+                            layer.msg("启动失败，请联系管理员!!!");
+                        }
+
+                        getTaskList();
+                    },
+                    error : function(data) {
+                        layer.msg("启动失败，请联系管理员!!!");
+                    }
+                });
+            }
+        });
+    }
+
+    function stopCheckTask(id) {
+        if(id==''){
+            layer.msg('请先选择');
+            return;
+        }
+        layer.msg('确定停止吗', {
+            time: 20000,
+            btn: ['确定', '取消']
+            ,yes:function(){
+                $.ajax({
+                    type : "post",
+                    url : "/task/stopCheckTask",
+                    data : {
+                        id: id,
+                    },
+                    dataType : "json",
+                    success : function(data) {
+                        if(data[0].code === '1') {
+                            layer.msg("停止成功");
+                        } else {
+                            layer.msg("停止失败，请联系管理员!!!");
+                        }
+                        getTaskList();
+                    },
+                    error : function(data) {
+                        layer.msg("停止失败，请联系管理员!!!");
+                    }
+                });
+            }
+        });
+    }
+
+    // 查看结果
+    function viewResult(id) {
+        location.href ='task_all_detail.html?id='+id;
+    }
+
+</script>

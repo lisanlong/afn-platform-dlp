@@ -1,0 +1,115 @@
+.header ul li:nth-child(2){background: #1239bc;}
+.menu a:nth-child(3){background: #1239bc;}
+.menu a:nth-child(3) em {color: #fff;}
+/*中间内容区*/
+.nbsy{
+	height:auto;
+	background: #eff4f8;
+	padding-left:30px ;
+	padding-right: 68px;
+	position: absolute;
+	top: 120px;
+	left: 210px;
+}
+.nbsy select{
+	width: 140px;
+	height: 28px;
+	border: 1px solid #aaa;
+	margin-right: 20px;
+	margin-bottom: 20px;
+}
+.nbsy .spanhead{
+	display: block;
+	margin: 20px 0 20px 0;
+	color: #6495bb;
+}
+.nbsy .spanhead a{
+	color: #6495bb;
+}
+.display_area{
+	width: 100%;
+	background: #fff;
+	border: 1px solid #ddd;
+	padding: 0 20px;
+	margin-bottom: 40px;
+}
+.nbsy .display_area p{
+	position: absolute;
+	top: 118px;
+	right: 60px;
+}
+.nbsy .display_area h3{
+	font-size: 16px;
+	font-weight: 600;
+	color: #333;
+	margin-bottom: 20px;
+}
+.nbsy input{
+	width: 40px;
+	height: 28px;
+	background:#2772d6 ;
+	color: #fff;
+	border-radius: 0;
+	text-align: center;
+	margin-left: -4px;
+	border:none;
+
+}
+.nbsy table{
+	/*height: 100%;*/
+	background: #fff;
+	/*border: 1px solid #2772d6;*/
+	margin-bottom: 10px;
+	/*padding: 80px 0 0;*/
+	table-layout: fixed;
+}
+.nbsy table th{
+	height: 46px;
+	background: #416df9;
+	font-size: 16px;
+	color: #fff;
+
+}
+.nbsy table th input,.nbsy table tr input{
+	width: 12px;
+	height: 12px;
+	background: #fff;
+	border: 1px solid #317df5;
+
+}
+.nbsy table tr{
+	height: 40px;
+	text-align: center;
+	font-size: 14px;
+	/*box-shadow: 1px 1px 4px #f1f1f1;*/
+}
+.nbsy table tr:nth-child(even){
+	background: #efefef;
+}
+.nbsy table tr td{padding: 5px 0;}
+.nbsy table tr td button {
+	background: none;
+	border: none;
+	margin: 3px 10px;
+	font-size: 12px;
+	font-weight: bold;
+	color: #2a58f4;
+	cursor: pointer;
+}
+.nbsy  #pageNum{
+	height: 60px;
+	text-align: center;
+}
+.nbsy  #pageNum p{display: inline-block;}
+.nbsy  #pageNum p  a{
+	height: 24px;
+	margin: 0 10px;
+	color: #2249ba;
+}
+.nbsy   #pageNum .pageNum_R input{width: 20px;height: 16px;}
+.nbsy #pageNum .pageNum_R  a{ width: 20px;height: 16px; border: 1px solid #999; margin-left: 10px;color: #333;}
+
+/*#popBox #recordMark input{*/
+/*	width: 60px;*/
+/*	height: 22px;*/
+/*}*/

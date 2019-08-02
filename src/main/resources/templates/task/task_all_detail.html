@@ -1,0 +1,228 @@
+<?
+	layout("/inc/layout.html",{title:"文档安全检查工具-任务详情",htmlType:"index",pageName:"home_index"}){
+?>
+<link rel="stylesheet" type="text/css" href="/css/task_warn.css"/>
+<style>
+    .header ul li:nth-child(2){background: #1239bc;}
+    .menu a:nth-child(2){background: #1239bc;}
+    .menu a:nth-child(2) em {color: #fff;}
+    .menu a:nth-child(3){background: #fff;}
+    .menu a:nth-child(3) em {color: #1239bc;}
+</style>
+<div class="exhibit">
+    <div class="menu left">
+        <!--<a href="task_source.html">
+            <img src="/img/task_03.png">
+            <em>数据源管理</em>
+        </a>-->
+        <a href="task_create.html">
+            <img src="/img/task_06.png">
+            <em>创建任务</em>
+        </a>
+        <a href="task_list.html.html">
+            <img src="/img/task_07.png">
+            <em>任务列表</em>
+        </a>
+        <a href="task_warn.html">
+            <img src="/img/task_09.png">
+            <em>任务预警</em>
+        </a>
+    </div>
+    <div class="nbsy">
+        <p  class="right" href="#">
+            <!--<input type="button" value="批量启动" onclick="startCheckTask(checkVals())">
+            <input type="button" value="批量停止" onclick="stopCheckTask(checkVals())">-->
+            <input type="button" style="border: none;width: 70px;height: 30px;border-radius: 4px;background: #fff;border: 1px solid #839afc;	color: #31478f;	margin-left: 7px;margin-top:13px;font-size: 12px;" value="返回" onclick="javascript :history.back(-1)">
+        </p>
+
+        <span class="spanhead"><a href="../home/index.html">首页 ></a><a href="task_source.html">任务管理 </a> >  任务列表  </span>
+
+        <div class="display_area">
+            <h3 id="taskName"></h3>
+            <input id="checkStatus" type="hidden" value=""/>
+            <table width="100%" cellspacing="0" cellpadding="0">
+                <th width="0%"><input type="hidden"></th>
+                <th width="5%">序号</th>
+                <th width="20%">文件名称</th>
+                <th width="16%">任务名称</th>
+                <th width="8%">原始密级</th>
+                <th width="8%">预测密级</th>
+                <th width="8%">确认密级</th>
+                <th width="5%">状态</th>
+                <th width="10%">创建人</th>
+                <th width="10%"> 创建时间</th>
+                <th width="10%">操作栏</th>
+                <tbody class="table_body" id="taskList">
+                </tbody>
+            </table>
+            <div id="page" style="text-align: center;"></div>
+            <div id="dataNull" style="height: 90px; line-height: 50px;" align="center"></div>
+        </div>
+    </div>
+</div>
+<?
+}
+?>
+
+<script>
+    var requestId;
+
+    var curr = 1;
+    $(function() {
+        requestId = GetRequest().id;
+        getWarnRecordList(curr);
+    })
+
+    // 获取请求参数
+    function GetRequest() {
+        var url = location.search; //获取url中"?"符后的字串
+        var theRequest = new Object();
+        if (url.indexOf("?") != -1) {
+            var str = url.substr(1);
+            strs = str.split("&");
+            for(var i = 0; i < strs.length; i ++) {
+                theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);
+            }
+        }
+        return theRequest;
+    }
+
+    // 预览任务
+    function checkRecordReview(id){
+        layer.open({
+            type : 2,
+            area : [ '800px', '600px' ],
+            scrollbar: true,
+            shadeClose: true,
+            fix : true, //不固定
+            title : '任务预览',
+            //skin: 'layui-layer-rim', //加上边框
+            btn: ['关闭'],
+            content : ["task_record_view.html?id="+id,'no'],
+            yes: function(index,layero){
+                //得到iframe页的窗口对象
+                // var iframeWin = parent.window[layer.find('iframe')[0]['name']];
+                // iframeWin.Page();
+                layer.close(index);
+            },
+            cancel : function(index) {
+            }
+        });
+    }
+
+    // 标记任务
+    function checkRecordMark(id) {
+        layer.open({
+            type : 2,
+            area : [ '800px', '600px'],
+            scrollbar: true,
+            shadeClose: true,
+            fix : true, //不固定
+            title : '任务标记',
+            //skin: 'layui-layer-rim', //加上边框
+            btn: ['保存 ', '关闭'],
+            content : ["task_record_mark.html?id="+id,'no'],
+            yes: function(index){
+                var res = window["layui-layer-iframe" + index].callbackdata();
+                // res = JSON.stringify(res);
+                // var val = layero.getElementById("recordMark").val();
+                console.log("==============> " + res);
+                $.ajax({
+                    type : "post",
+                    url : "/task/recordReview",
+                    data : res,
+                    dataType : "json",
+                    success : function(data) {
+                        if(null != data[0].result) {
+                            console.log(data[0].result);
+                            layer.msg(data[0].result);
+                        }
+                    },
+                    error : function(data) {
+                        alert("请求失败");
+                    }
+                });
+                parent.layer.msg("操作成功!", {time: 1000}, function () {
+                    //重新加载父页面
+                    getWarnRecordList(curr);
+                    layer.close(index);
+                });
+                return;
+            },
+            cancel : function(index) {
+            }
+        });
+    }
+
+    function getWarnRecordList(curr){
+        $.ajax({
+            type : "post",
+            url : "/task/getWarnRecordList",
+            data : {
+                "pageNum":curr||1,
+                "pageSize":10,
+                "taskId":requestId,
+                "checkStatus":$("#checkStatus").val()
+            },
+            dataType : "json",
+            success : function(data) {
+                if(data[0].data.length>0){
+                    $("#dataNull").html("");
+                }else{
+                    $("#dataNull").html("<span style='font-size: 15px;'>暂无数据</span>");
+                }
+                var str = '';
+                for(var i=0;i<data[0].data.length;i++){
+                    str+='<tr><td><input type="hidden" name="id" class="check check-one" value="'+data[0].data[i].id + '">' +
+                        '<input type="hidden" name="checkStatus" value="'+data[0].data[i].checkStatus+'"/></td>'
+                        +'<td>'+(((curr||1)-1)*10+i+1)+'</td>'
+                        +'<td>'+data[0].data[i].fileName+'</td>'
+                        +'<td>'+data[0].data[i].taskName+'</td>'
+                        +'<td>'+data[0].data[i].originLabel+'</td>'
+                        +'<td>'+data[0].data[i].checkLabel+'</td>'
+                        +'<td>'+data[0].data[i].reviewLabel+'</td>'
+                        +'<td>'+data[0].data[i].status+'</td>'
+                        +'<td>'+data[0].data[i].createUser+'</td>'
+                        +'<td>'+data[0].data[i].createTime+'</td>'+
+                        '</td>' +
+                        '</tr>';
+                }
+                $('#taskList').html(str);
+                laypage({
+                    cont : "page", //容器。值支持id名、原生dom对象，jquery对象,
+                    pages : data[0].count, //总页数
+                    skip : false, //是否开启跳页
+                    curr : curr || 1,
+                    first: '首页',
+                    last: '尾页',
+                    skin : 'molv', //加载内置皮肤，也可以直接赋值16进制颜色值，如:#c00
+                    groups : 5,//连续显示分页数
+                    jump : function(obj, first) { //触发分页后的回调
+                        if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                            getWarnRecordList(obj.curr);
+                            curr=obj.curr;
+                        }
+                    }
+                });
+
+                // 动态显示操作栏
+                $("#taskList tr").each(function(){
+                    //使用children（）定位到<tr></tr>中的指定<td></td>
+                    var id = $(this).children("td").children("input[name=id]").val();
+                    var checkStatus = $(this).children("td").children("input[name=checkStatus]").val();
+                    // console.log(checkStatus + "<--------------> " + id);
+                    // if(checkStatus == 2) {
+                        $(this).append('<td><button onclick="checkRecordReview('+id+')">预览</button><button onclick="checkRecordMark('+id+')">标注</button></td>');
+                    // } else {
+                    //     $(this).append('<td><button onclick="checkRecordReview('+id+')">预览</button></td>');
+                    // }
+                });
+
+            },
+            error : function(data) {
+                alert("请求失败");
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,86 @@
+html,body{height: 100%;width: 100%;margin:0;padding:0;}
+body{
+	background:url(../img/login.jpg)no-repeat 0px 0px;
+	width:100%;
+	height:100%;
+	background-size:100% 100%;
+	background-attachment: fixed;
+	position:absolute;
+	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='bg-login.png',sizingMethod='scale');
+}
+/* 登录模块*/
+.login{
+	width: 25%;
+	height: 400px;
+	background: #fff;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 60%;
+	right: 40%;
+	margin: auto;
+	/*right: 320px;*/
+	text-align: center;
+	box-shadow:0 0 10px rgba(0, 204, 204, .7);
+}
+.login h1{
+	font-size: 22px;
+	color: #416df9;
+	text-align: center;
+	margin-top: 30px;
+	margin-bottom: 30px;
+}
+.login img:nth-of-type(1){
+	position: absolute;
+	top: 100px;
+	left: 10%;
+}
+.login input:nth-of-type(1) {
+	width: 70%;
+	height: 44px;
+	border: 1px solid #1489cc;
+	border-radius: 4px;
+	padding-left: 50px;
+	font-size: 15px;
+	margin-bottom: 30px;
+}
+.login img:nth-of-type(2){
+	position: absolute;
+	top:174px;
+	left: 10%;
+}
+.login input:nth-of-type(2) {
+	width: 70%;
+	height: 44px;
+	border: 1px solid #1489cc;
+	border-radius: 4px;
+	padding-left: 50px;
+	font-size: 15px;
+	margin-bottom: 60px;
+}
+.login .select{
+	display: block;
+	position: absolute;
+	top: 230px;
+	left: 9%;
+	width: 14px;
+	height: 14px;
+}
+.login i{
+	position: absolute;
+	top: 228px;
+	left: 14%;
+}
+.login i a{
+	color: #666;
+}
+button{
+	border: none;
+	width: 80%;
+	height: 44px;
+	background: #2a58f4;
+	color: white;
+	font-size: 14px;
+	cursor: pointer;
+}
+

@@ -1,0 +1,177 @@
+<?
+	layout("/inc/win_layout.html",{title:"文档安全检查工具-密级管理",htmlType:"index",pageName:"win_index"}){
+?>
+
+<div id="popBox">
+    <div class="content">
+        <label>用户名:</label>
+        <input id="username" maxlength="20" name="username" type="text" placeholder="请输入用户名">
+        <br/>
+        <label>密码:</label>
+        <input id="password" name="password" type="password" placeholder="请输入密码">
+        <br/>
+        <label>昵称:</label>
+        <input id="nickname" name="nickname" type="text" placeholder="请输入昵称">
+        <br/>
+        <label>手机号:</label>
+        <input id="telephone" name="telephone" type="text" placeholder="请输入手机号">
+        <br/>
+        <label>邮箱:</label>
+        <input id="email" name="email" type="text" placeholder="请输入邮箱">
+        <br/>
+        <label>部门:</label>
+        <select id="depId" name="depId">
+        </select>
+        <br/>
+        <label>状态:</label>
+        <select id="isStoped">
+            <option value="0">启用</option>
+            <option value="1">禁用</option>
+        </select>
+        <br/>
+    </div>
+
+</div>
+<?
+}
+?>
+
+<script type="text/javascript">
+    $(function() {
+        getDepartmentAll();
+        if(GetQueryString('id')!=0){
+            if(GetQueryString('type') !=null && GetQueryString('type') == 0){
+                $("#isStoped").attr("disabled","disabled");
+            }
+            if(GetQueryString('id')==1){
+                $("#isStoped").attr("disabled","disabled");
+            }
+            $("#username").attr("disabled","disabled");
+            getSystemUser();
+        }
+        $('#username').keyup(function() {
+            var temp_num =  $(this).val().replace(/[\u4E00-\u9FA5]|[\uFE30-\uFFA0]/g,'');
+            $(this).val(temp_num);
+        });
+    });
+
+    function GetQueryString(name){
+        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if(r!=null)return  encodeURI(r[2]); return null;
+    }
+
+
+    function Page() {
+        if ($.trim($("#username").val()).length < 1) {
+            layer.msg('用户名不能为空');
+            return null;
+        }
+        if (GetQueryString('id') ==0 && $.trim($("#password").val()).length < 1) {
+            layer.msg('密码不能为空');
+            return null;
+        }
+        if (GetQueryString('id') ==0 && $.trim($("#password").val()).length < 6) {
+            layer.msg('密码长度不能小于六位');
+            return null;
+        }
+        if (GetQueryString('id') !=0 && $.trim($("#password").val()).length > 0 && $.trim($("#password").val()).length < 6) {
+            layer.msg('密码长度不能小于六位');
+            return null;
+        }
+        if ($.trim($("#telephone").val()).length < 1) {
+            layer.msg('手机号码不能为空！');
+            return null;
+        }
+        var reg = /(1[3-9]\d{9}$)/;
+        if (!reg.test($('#telephone').val())){
+            layer.msg("手机号格式不正确");
+            return null;
+        }
+        var mail = $('#email').val();
+        if (mail != '') {//判断
+            var reg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$/;
+            if (!reg.test(mail)) {
+                layer.msg('邮箱格式不正确');
+                return null;
+            }
+        }
+        if ($("#depId").val()=='') {
+            layer.msg('部门不能为空');
+            return null;
+        }
+        $.ajax({
+            type : "post",
+            url : "/addOrEditSystemUser",
+            data : {
+                "id" : GetQueryString("id"),
+                "username" :$("#username").val(),
+                "password" :$("#password").val(),
+                "nickname" :$("#nickname").val(),
+                "telephone" :$("#telephone").val(),
+                "email" :$("#email").val(),
+                "depId" :$("#depId").val(),
+                "isStoped" :$("#isStoped").val()
+            },
+            dataType : "json",
+            async : false,
+            success : function(data) {
+                if(data[0].type=='false'){
+                    layer.msg('名称重复');
+                }else{
+                    parent.layer.msg('保存成功');
+                    var url=window.parent.location.pathname;
+                    url=url.substring(url.lastIndexOf("/")+1,url.length);
+                    if(url=='user.html'){
+                        window.parent.getSystemUserList();
+                    }
+                    var index = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(index);
+                }
+            },
+            error : function(data) {
+                alert("请求失败");
+            }
+        });
+    }
+    //数据回显
+    function getSystemUser() {
+        $.ajax({
+            type : "post",
+            url : "/getSystemUser",
+            dataType : "json",
+            async:false,
+            data :{
+                "id":GetQueryString('id')
+            },
+            success : function(res) {
+                $("#username").val(res[0].username);
+                $("#password").val("");
+                $("#nickname").val(res[0].nickname);
+                $("#telephone").val(res[0].telephone);
+                $("#email").val(res[0].email);
+                $("#depId").val(res[0].dptId);
+                $("#isStoped").val(res[0].isStoped);
+            }
+        });
+    };
+    function getDepartmentAll() {
+        $.ajax({
+            type : "post",
+            url : "/getDepartmentAll",
+            dataType : "json",
+            async:false,
+            data :{
+
+            },
+            success : function(res) {
+                var str = '<option value="">请选择</option>';
+                for(var i=0;i<res.length;i++){
+                    str+='<option value="'+res[i].id+'">'+res[i].name+'</option>';
+                }
+                $("#depId").html(str);
+            }
+        });
+    };
+
+</script>

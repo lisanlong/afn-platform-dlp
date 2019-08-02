@@ -1,0 +1,73 @@
+<?
+	layout("/inc/win_layout.html",{title:"文档安全检查工具-登录",htmlType:"index",pageName:"win_index"}){
+?>
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>登录页</title>
+		<link rel="stylesheet" type="text/css" href="/css/login.css"/>
+	</head>
+	<body>
+
+		<div class="login">
+			<h1>登录</h1>
+			<img src="/img/login_03.png"/>
+			<input type="text" name="" placeholder="请输入用户名" name="username" id="username" >
+			<img src="/img/login_06.png"/>
+			<input type="password" placeholder="请输入密码"  name="password" id="password" >
+			<input class="select" type="checkbox" id='rpassword' ><i><label for="rpassword" class="jipass">&nbsp;记住密码</label></i>
+
+			<button onclick="login();" >登录</button>
+		</div>
+	</body>
+</html>
+
+	<?} ?>
+<script>
+    $(window).keydown(function(event) {  //键盘敲击事件
+        if (event.keyCode == 13) {
+            login();
+        }
+    });
+	function login() {
+		var userName = document.getElementById("username").value;
+		if(userName == ''){
+			layer.msg("请输入用户名");
+			return;
+		}
+		var userPass = document.getElementById("password").value;
+		if(userPass == ''){
+			layer.msg("请输入密码");
+			return;
+		}
+        if(userPass.length<6){
+            layer.msg("密码长度不能小于六位");
+            return;
+        }
+		$.ajax({
+			type : "post",
+			url : "/login",
+			data : {
+				"username" : userName,
+				"password" : userPass,
+				"rpassword" : document.getElementById("rpassword").checked
+			},
+			dataType : "json",
+			async : false,
+			success : function(res) {
+				if ("ok"==res[0].tishi) {
+				    layer.msg('登录成功');
+                    window.setTimeout('window.location.href = "/home/index.html";', 800);
+				} else if ("no"==res[0].tishi) {
+					layer.msg("请检查用户名或密码是否正确");
+				} else if ("stop"==res[0].tishi) {
+                    layer.msg("此用户已被禁用，请联系管理员");
+                }
+			}
+		});
+	}
+
+</script>
+	</body>
+</html>

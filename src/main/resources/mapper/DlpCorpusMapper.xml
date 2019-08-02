@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cloud.framework.mapper.DlpCorpusMapper">
+
+    <!-- 开启二级缓存 -->
+    <cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="org.cloud.framework.model.DlpCorpus">
+        <id column="id" property="id" />
+        <result column="cnum" property="cnum" />
+        <result column="file_name" property="fileName" />
+        <result column="file_size" property="fileSize" />
+        <result column="file_type" property="fileType" />
+        <result column="file_path" property="filePath" />
+        <result column="content" property="content" />
+        <result column="feature" property="feature" />
+        <result column="is_published" property="isPublished" />
+        <result column="is_stoped" property="isStoped" />
+        <result column="create_uid" property="createUid" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, cnum, file_name, file_size, file_type, file_path, content, feature, is_published, is_stoped, create_uid, create_time
+    </sql>
+
+</mapper>

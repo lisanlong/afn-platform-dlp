@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cloud.framework.mapper.DlpClassifyMapper">
+
+    <!-- 开启二级缓存 -->
+    <cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="org.cloud.framework.model.DlpClassify">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="use_level" property="useLevel" />
+        <result column="cnum" property="cnum" />
+        <result column="detail" property="detail" />
+        <result column="is_stoped" property="isStoped" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, use_level, cnum, detail, is_stoped, create_time
+    </sql>
+
+</mapper>

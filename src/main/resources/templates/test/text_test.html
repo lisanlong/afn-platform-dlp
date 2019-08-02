@@ -1,0 +1,214 @@
+<?
+	layout("/inc/layout.html",{title:"文档安全检查工具-文本测试",htmlType:"index",pageName:"home_index"}){
+?>
+<link rel="stylesheet" type="text/css" href="/css/text_test.css"/>
+
+<div class="exhibit">
+    <div class="menu left">
+        <a href="file_test.html">
+            <img src="/img/test_05.png">
+            <em>文件测试</em>
+        </a>
+        <a href="javascript:;">
+            <img src="/img/test_07.png">
+            <em>文本测试</em>
+        </a>
+    </div>
+
+    <!--内容区-->
+    <div class="main">
+        <span><a href="../home/index.html">首页 ></a><a href="file_test.html">在线测试 </a> >  文本测试  </span>
+        <div class="model">
+            <label style="vertical-align:top;">文本测试内容:</label><textarea placeholder="(限5000字以内)" maxlength="5000" style="width: 80%;height: 300px; border: 1px solid #D3D4D3;padding: 8px; overflow:hidden;overflow-y:auto;resize:none;font-size: 16px;" id="textArea"></textarea><br/>
+            <label>训练模型版本:</label>
+            <select id="select_model">
+                <!--<option value="0">&#45;&#45;请选择&#45;&#45;</option>-->
+                <!--<option value="1">V1.0</option>
+                <option value="2">V2.0</option>-->
+            </select><br/><br/>
+            <label>本次检测范围:</label>
+            <ul id="test_scope">
+                <!--<li><strong>秘密</strong><img src="/img/secret_19.png"></li>
+                <li><strong>绝密</strong><img src="/img/secret_19.png"></li>-->
+            </ul><br>
+            <!--            <div class="progress_bar">
+                            <i></i>
+                            <em>30%</em>
+                        </div>-->
+            <!--            <div class="progress">
+                            <div class="layui-progress layui-progress-big" lay-filter="progressBar">
+                                <div class="layui-progress-bar layui-bg-blue" lay-percent="0%"><span class="layui-progress-text">0%</span></div>
+                            </div>
+                        </div>-->
+            <button id="check_now">立即检测</button>
+        </div>
+        <div class="version" id="textPredictResult" style="display:none">
+            <h3>检测结果</h3>
+            <label>预测密级:</label><strong><img src="/img/secret_19.png"><span id="ycmj"><!--秘密--></span></strong><br>
+            <div id="checkResult">
+            <label style="vertical-align: top" id="minfo">密级触发词:</label><span id="mjcfc" class="tips"  style="margin-left: 10px"><!--<em>某军事装备</em>--></span><br>
+            </div>
+            <label id="mjdwId" style="vertical-align:top;">密级定位:</label><br><pre id="xgjz"></pre><br/>
+
+        </div>
+    </div>
+</div>
+
+<?
+}
+?>
+
+<script>
+    $(function(){
+        getAllModel();
+    })
+
+    // 获取所有的检测模型
+    function getAllModel() {
+        $.ajax({
+            type: "POST",
+            url: "/onLineTest/getAllModel",
+            async : false,
+            datatype:'json',
+            success : function(list) {
+                var data = $.parseJSON(list);
+                $.each(data, function(i, item){
+                    $("#select_model").append("<option value=\""+ item.value +"\">V"+item.key+"</option>");
+                    if(i == data.length - 1) {
+                        $("#select_model").val(item.value);
+                    }
+                });
+                if($("#select_model").children('option:selected').val() != '0') {
+                    getSelectedLabels();
+                }
+            },
+            error : function(data) {
+                alert("请求失败, 请刷新重试");
+            }
+        });
+    };
+
+    function getSelectedLabels() {
+        var version = $("#select_model").val();
+        //console.log("----------------> " + version);
+        $("#test_scope").html("");
+        $.ajax({
+            type: "POST",
+            url: "/onLineTest/getSelectedLabels",
+            data:{"id":version},
+            async : false,
+            datatype:'json',
+            success : function(list) {
+                var data = $.parseJSON(list);
+                $.each(data, function(i, item){
+                    $("#test_scope").append("<li><strong>"+item+"</strong><img src=\"/img/secret_19.png\"></li>");
+                });
+            },
+            error : function(data) {
+                alert("请求失败, 请刷新重试");
+            }
+        });
+    }
+
+    $("#select_model").change(function(){
+        var version = $("#select_model").val();
+        //console.log("----------------> " + version);
+        $("#test_scope").html("");
+        $.ajax({
+            type: "POST",
+            url: "/onLineTest/getSelectedLabels",
+            data:{"id":version},
+            async : false,
+            datatype:'json',
+            success : function(list) {
+                var data = $.parseJSON(list);
+                $.each(data, function(i, item){
+                    $("#test_scope").append("<li><strong>"+item+"</strong><img src=\"/img/secret_19.png\"></li>");
+                });
+            },
+            error : function(data) {
+                alert("请求失败, 请刷新重试");
+            }
+        });
+
+    });
+
+    $("#check_now").click(function(){
+        var textArea = $("#textArea").val();
+        if($.trim(textArea)==''){
+            layer.msg('请输入测试内容');
+            return;
+        }
+        var id = $("#select_model").children('option:selected').val();
+        var loadIndex = layer.load();
+        $.ajax({
+            type: "POST",
+            url: "/onLineTest/textPredict",
+            data:{"id":id, "textArea": textArea},
+            async : true,
+            datatype:'json',
+            success : function(res) {
+                var data = $.parseJSON(res);
+                //console.log(data);
+                layer.close(loadIndex);
+                layer.msg('检测完成');
+                // 获取检测的结果
+                getCheckResult(data.maxProLabel);
+                // $("#ycmj").html();
+
+                // 模型检测
+                if(data.predictType==0){
+                    $("#checkResult").attr('style','display:none;margin-top:14px');
+                    $("pre").attr("style","width: 77%;height: 390px; border: 1px solid #ddd; overflow:hidden;overflow-y:auto;resize:none;margin-top:-75px;margin-left:-10px");
+                }else{ // 触发词检测
+                    $("#checkResult").attr('style','display:block;margin-top:14px');
+                    $("pre").attr("style","width: 77%;height: 310px; border: 1px solid #ddd; overflow:hidden;overflow-y:auto;resize:none;margin-left:-8px;margin-top:16px;margin-left:-10px");
+                    $("#minfo").html('密级触发词:');
+
+                }
+                var lab ='';
+               // var dwSen = textArea;
+                for(var k in data.wordWeight){
+                    lab+='<em>'+k+'</em>';
+                    // dwSen = dwSen.replace(new RegExp(k, "gm"),'<strong style="color: red">'+k+'</strong>');
+                }
+               var _p = $("<p></p>");
+                /*for(var k in data.maxSentences){
+                    _p.append('<strong style="color: red;font-size: 16px;">'+data.maxSentences[k].replace(/　/ig,'')+'</strong>').append("<br>");
+                }*/
+                _p.append(data.content);
+
+                $("#mjcfc").html(lab);
+                $("#xgjz").html(_p);
+                $("#textPredictResult").attr("style", "display:block;height:560px;overflow:auto");
+
+
+                // 滚动条滚动到指定的位置 textPredictResult
+                // $("#textPredictResult").scrollIntoView();
+            },
+            error : function(data) {
+                layer.close(loadIndex);
+                alert("请求失败, 请刷新重试");
+            }
+        });
+        return false;
+    });
+
+
+    function getCheckResult(label) {
+        $.ajax({
+            type: "POST",
+            url: "/onLineTest/getCheckResult",
+            async : false,
+            data:{'label':label},
+            datatype:'json',
+            success : function(data) {
+                $("#ycmj").html(data);
+            },
+            error : function(list) {
+                alert("请求失败, 请刷新重试");
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,118 @@
+<?
+	layout("/inc/win_layout.html",{title:"文档安全检查工具-密级管理",htmlType:"index",pageName:"win_index"}){
+?>
+
+<div id="popBox">
+    <div class="content">
+        <label>术语名称:</label>
+        <input id="name" maxlength="20" name="name" type="text" placeholder="请输入术语名称">
+        <br/>
+        <label>术语分类:</label>
+        <select id="termclassId" name="termclassId">
+        </select>
+        <br/>
+        <label>状态:</label>
+        <select id="isStoped">
+            <option value="0">启用</option>
+            <option value="1">禁用</option>
+        </select>
+        <br/>
+    </div>
+
+</div>
+<?
+}
+?>
+
+<script type="text/javascript">
+    $(function() {
+        getTermClassList();
+        if(GetQueryString('id') !=0){
+            getTerm();
+        }
+        $('#name').keyup(function() {
+            var temp_num =  $(this).val().replace(/\s+/g,"");
+            $(this).val(temp_num);
+        });
+    });
+
+    function GetQueryString(name){
+        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if(r!=null)return  encodeURI(r[2]); return null;
+    }
+
+
+    function Page() {
+        if ($.trim($("#name").val()).length < 1) {
+            layer.msg('术语名称不能为空');
+            return null;
+        }
+        if ($("#termclassId").val()=='') {
+            layer.msg('术语分类不能为空');
+            return null;
+        }
+        $.ajax({
+            type : "post",
+            url : "/addOrEditTerm",
+            data : {
+                "id" : GetQueryString("id"),
+                "name" :$("#name").val(),
+                "termclassId" :  $("#termclassId").val(),
+                "isStoped" :$("#isStoped").val()
+            },
+            dataType : "json",
+            async : false,
+            success : function(data) {
+                if(data[0].type=='false'){
+                    layer.msg('名称重复');
+                }else{
+                    parent.layer.msg('保存成功');
+                    var index = parent.layer.getFrameIndex(window.name);
+                    window.parent.getTermList();
+                    window.parent.getPublishNum();
+                    parent.layer.close(index);
+                }
+            },
+            error : function(data) {
+                alert("请求失败");
+            }
+        });
+    }
+    //数据回显
+    function getTerm() {
+        $.ajax({
+            type : "post",
+            url : "/getTerm",
+            dataType : "json",
+            async:false,
+            data :{
+                "id":GetQueryString('id')
+            },
+            success : function(res) {
+                $("#name").val(res[0].name);
+                $("#termclassId").val(res[0].termclassId);
+                $("#isStoped").val(res[0].isStoped);
+            }
+        });
+    };
+    function getTermClassList() {
+        $.ajax({
+            type : "post",
+            url : "/getTermClassListAll",
+            dataType : "json",
+            async:false,
+            data :{
+
+            },
+            success : function(res) {
+                var str = '<option value="">请选择</option>';
+                for(var i=0;i<res.length;i++){
+                    str+='<option value="'+res[i].id+'">'+res[i].name+'</option>';
+                }
+                $("#termclassId").html(str);
+            }
+        });
+    };
+
+</script>

@@ -1,0 +1,246 @@
+body,ol,ul,h1,h2,h3,h4,h5,h6,p,tr,th,td,dl,dd,form,fieldset,legend,input,textarea,select{margin:0;padding:0}
+h1,h2,h3,h4,h5,h6{font-weight: normal;}
+body{font:12px "微软雅黑","Arial Narrow",HELVETICA;background: #eff4f8;color: #333;}
+a{text-decoration:none}
+em{font-style:normal}
+li{list-style:none}
+i{font-style: normal;}
+b strong{font-weight: normal;}
+img{border:0;vertical-align:middle}
+.left{float:left;}
+.right{float:right;}
+/*头部*/
+.header{
+    width: 100%;
+    height: 120px;
+    background: #1f44cf;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999999;
+}
+.header h1{
+    margin-left: 30px;
+    margin-top: 24px;
+}
+.header ul{
+    margin-left: 60px;
+}
+.header li{
+    width: 120px;
+    height: 120px;
+    /*border: 1px solid red;*/
+    float: left;
+    margin-right: 30px;
+}
+.header li img{
+    margin-top: 34px;
+    margin-left: 44px;
+}
+.header li span{
+    display: block;
+    font-size: 16px;
+    color: #fff;
+    text-align: center;
+    line-height: 40px;
+}
+.header .message{
+    width: 156px;
+    height: 84px;
+    /*background: #fff;*/
+    /*border: 1px solid red;	*/
+    position: absolute;
+    top: 24px;
+    right: 48px;
+    padding: 6px 6px;
+}
+/*.header .message p{*/
+/*position: absolute;*/
+/*top: 18px;*/
+/*left: 30px;*/
+/*}*/
+
+.header .message em{
+    display: inline-block;
+    width: 54px;
+    height: 54px;
+    border-radius: 8px;
+    background: #fff;
+    margin-top: 8px;
+}
+.header .message p i{
+    color: #fff;
+    position: absolute;
+    top: 30px;
+    left: 70px;
+    font-size: 14px;
+}
+.header .message p span{
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border: 6px solid #0ff;
+    border-color: #ddd transparent   transparent  transparent ;
+    position: absolute;
+    top: 38px;
+    right: 14px;
+}
+.header .message_box{
+    z-index: 999;
+    width: 150px;
+    height: 70px;
+    background: #fff;
+    position: absolute;
+    top: 110px;
+    right: 2px;
+    /*padding: 14px 0 0 16px;*/
+    margin-top: -14px;
+    text-align: left;
+    line-height: 30px;
+    display: none;
+}
+.header .message .message_box a{
+    display: block;
+    width: 114px;
+    height: 26px;
+    /*background: #1239bc;*/
+    padding: 10px 0 0 16px;
+    color: #666;
+    font-size: 14px;
+    line-height: 10px;
+}
+.header li:hover{
+    background: #1239bc;
+}
+
+/*左侧二级菜单栏及大框*/
+.exhibit{
+    width: 100%;
+    height: 100%;
+
+}
+.menu{
+    width: 210px;
+    height: 100%;
+    overflow:hidden;padding-bottom:9999px; margin-bottom:-9999px; float:left;
+    background: #fff;
+    position: fixed;
+    top: 120px;
+    left: 0;
+    z-index: 99999;
+    padding-top: 20px;
+}
+/*.menu li{*/
+    /*width: 190px;*/
+    /*height: 60px;*/
+    /*font-size: 16px;*/
+    /*padding-left: 40px;*/
+    /*line-height: 60px;*/
+/*}*/
+/*.menu li:nth-child(1){
+	background: #1239bc;
+	color: #fff;
+}*/
+.menu a{
+    display: block;
+    width: 210px;
+    height: 50px;
+    margin-bottom: 16px;
+    color: #296c95;
+    font-size: 16px;
+    line-height: 50px;
+}
+.menu a img{
+    margin-left: 30px;
+}
+.menu a em{
+    margin-left: 4px;
+}
+.menu a:hover{
+    background: #dde4ff;
+}
+/*.menu li:nth-child(1) a{
+	color: #fff;
+}*/
+
+/*.menu li:hover{*/
+    /*background: #dde4ff;*/
+/*}*/
+/*.menu li:hover a{*/
+    /*color: #296c95;*/
+/*}*/
+
+/*背景层*/
+#popLayer {
+    display: inline;
+    background-color: #000;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+    -moz-opacity: 0.3;
+    opacity: 0.3;
+}
+/*弹出层*/
+#popBox {
+    display: inline;
+    background-color: #FFFFFF;
+    z-index: 11;
+    position:fixed;
+    top:0;
+    right:0;
+    left:0;
+    bottom:0;
+    margin:auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#popBox .content{
+    padding: 20px 30px;
+    overflow: hidden;
+}
+#popBox .content label{
+    display:inline-block;
+    width: 75px;
+    margin-right: 10px;
+    text-align: right;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 30px;
+}
+#popBox .content input{
+    width: 290px;
+    height: 30px;
+    border: 1px solid #2772d6;
+}
+#popBox .content textarea{
+    width: 390px;
+    height: 70px;
+    border: 1px solid #2772d6;
+    overflow:hidden;
+    overflow-y:auto;
+    resize:none;
+}
+#popBox .content .choose{
+    border: 0;
+    width:120px;
+    height: 30px;
+    border: 1px solid #2772d6;
+    box-sizing:content-box;
+}
+#popBox .content select{
+    border: 0;
+    width:180px;
+    height: 30px;
+    border: 1px solid #2772d6;
+    box-sizing:content-box;
+}
+table tbody tr td {
+    table-layout: fixed;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

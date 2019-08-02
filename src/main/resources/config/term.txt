@@ -1,0 +1,5 @@
+name 名称
+category 分类
+imagePath 图片路径
+content 内容
+relatedWeapons 相关兵器

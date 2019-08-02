@@ -1,0 +1,642 @@
+<?
+	layout("/inc/layout.html",{title:"文档安全检查工具-首页",htmlType:"index",pageName:"home_index"}){
+?>
+
+<link rel="stylesheet" type="text/css" href="/css/index.css"/>
+<div class="exhibit">
+    <!--概况统计模块-->
+    <div class="statistics">
+
+        <p style="position: relative">
+            <span></span>
+            <i>概况统计</i>
+            <div class="help-tip" style="position: absolute;top: 7px;left: 162px;">
+                <p>当前系统中所有的任务记录的数量以及所有的预警数量的概览。</p>
+            </div>
+        </p>
+        <div class="sj" style="margin-top: -45px">
+            <ul>
+                <li>
+                    <a href="/task/task_warn.html">
+                        <h5>文件检查总量</h5>
+                        <h3 id="totalCheckFilesNum">0</h3>
+
+                    </a>
+                </li>
+                <li>
+                    <a href="/task/task_warn.html?checkStatus=2">
+                        <h5>预警总量</h5>
+                        <h3 id="totalWarnFilesNum">0</h3>
+
+                    </a>
+                </li>
+                <li>
+                    <a href="/task/task_warn.html?reviewStatus=2">
+                        <h5>违规总量</h5>
+                        <h3 id="realWarnFilesNum">0</h3>
+
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!--内容线图展示模块-->
+    <div class="main">
+        <ul>
+            <li style="position: relative">
+                    <span></span>
+                    <i>文件统计+预警统计</i>
+                    <div class="help-tip" style="position: absolute;top: 7px;left: 187px;">
+                                <p>近期系统每天检查的任务记录数量以及对应的预警数量的概览图。</p>
+                    </div>
+
+                <div class="content" id="check_trend_div" align="center" style="width:95%;height:92%;margin-top: 11px;margin-top: 11px">
+                    <!--<img src="/img/2~首页_03.png"/>-->
+                </div>
+            </li>
+            <li style="position: relative">
+                <span></span>
+                <i>部门预警统计</i>
+                <div class="help-tip" style="position: absolute;top: 7px;left: 138px;">
+                    <p>系统中不同部门统计数量图。</p>
+                </div>
+                <div class="content" id="department_summary_div" align="center" style="width:95%;height:95%;margin-top: -18px">
+                    <!--<img src="/img/2~首页_05.png"/>-->
+                </div>
+            </li>
+            <li style="position: relative">
+                <span></span>
+                <i>当日预警</i>
+                <div class="help-tip" style="position: absolute;top: 7px;left: 103px;">
+                    <p>当天系统中检查预警数量图。</p>
+                </div>
+                <div class="content" id="task_trend_div" align="center" style="width: 95%;height:92%;margin-top: 15px">
+                    <!--<img src="/img/2~首页_10.png"/>-->
+                </div>
+
+            </li>
+        </ul>
+    </div>
+</div>
+
+<?
+}
+?>
+
+<script>
+    $(function(){
+        // 获取所有的数据
+        getCheckNums();
+        // 绘制任务趋势图
+        drawTaskTrendGraph();
+        /*// 绘制各个版本使用率饼图
+        drawVersionUsageRateGraph();*/
+        // 绘制部门汇总图
+        drawDepartmentSummaryGraph();
+        // 绘制检查趋势图
+        drawCheckTrendGraph();
+
+    });
+
+    function getCheckNums() {
+        $.ajax({
+            type: "POST",
+            url: "/index/getCheckNums",
+            async : false,
+            datatype:'json',
+            success : function(list) {
+                console.log(list);
+                var data = JSON.parse(list);
+                $("#totalCheckFilesNum").text(data.totalCheckFilesNum);
+                // $("#totalCorpusNum").text(data.totalCorpusNum);
+                // $("#totalTaskNum").text(data.totalTaskNum);
+                $("#totalWarnFilesNum").text(data.totalWarnFilesNum);
+                $("#realWarnFilesNum").text(data.realWarnFilesNum);
+            },
+            error : function(data) {
+                alert("请求失败, 请刷新重试");
+            }
+        });
+    };
+
+    // 预警 + 检查总数图
+    function drawCheckTrendGraph() {
+        $.ajax({
+            type: "POST",
+            url: "/index/getWarnAndTotalTrend",
+            async : false,
+            datatype:'json',
+            success : function(list) {
+                var data = JSON.parse(list);
+                console.log(data);
+                myChart = echarts.init(document.getElementById('check_trend_div'));
+                option = {
+                    tooltip: {},
+                    grid: {
+                        top: '8%',
+                        left: '1%',
+                        right: '1%',
+                        bottom: '8%',
+                        containLabel: true,
+                    },
+                    legend: {
+                        itemGap: 50,
+                        data: ['文件数量','预警数量'],
+                        textStyle: {
+                            color: 'black',
+                            borderColor: 'purple'
+                        },
+                    },
+                    xAxis: [{
+                        type: 'category',
+                        boundaryGap: true,
+                        axisLine: { //坐标轴轴线相关设置。数学上的x轴
+                            show: true,
+                            lineStyle: {
+                                color: 'black'
+                            },
+                        },
+                        axisLabel: { //坐标轴刻度标签的相关设置
+                            textStyle: {
+                                color: 'black',
+                                margin: 15,
+                            },
+                        },
+                        axisTick: {
+                            show: false,
+                        },
+                        data: data.keys,
+                    }],
+                    yAxis: [{
+                        type: 'value',
+                        min: 0,
+                        // max: 140,
+                        splitNumber: 7,
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                color: '#0a3256'
+                            }
+                        },
+                        axisLine: {
+                            show: false,
+                        },
+                        axisLabel: {
+                            margin: 20,
+                            textStyle: {
+                                color: 'black',
+
+                            },
+                        },
+                        axisTick: {
+                            show: false,
+                        },
+                    }],
+                    series: [
+                        {
+                        name: '文件数量',
+                        type: 'line',
+                        smooth: true, //是否平滑曲线显示
+                        // 			symbol:'circle',  // 默认是空心圆（中间是白色的），改成实心圆
+                        showAllSymbol: true,
+                        symbol: 'emptyCircle',
+                        symbolSize: 6,
+                        lineStyle: {
+                            normal: {
+                                color: "#665adf", // 线条颜色
+                            },
+                            borderColor: 'purple'
+                        },
+                        label: {
+                            show: true,
+                            position: 'top',
+                            textStyle: {
+                                color: 'black',
+                            }
+                        },
+                        itemStyle: {
+                            normal: {
+                                color: "#665adf",
+
+                            }
+                        },
+                        tooltip: {
+                            show: true
+                        },
+                        areaStyle: { //区域填充样式
+                            normal: {
+                                //线性渐变，前4个参数分别是x0,y0,x2,y2(范围0~1);相当于图形包围盒中的百分比。如果最后一个参数是‘true’，则该四个值是绝对像素位置。
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                    offset: 0,
+                                    color: '#665adf'
+                                },
+                                    {
+                                        offset: 1,
+                                        color: 'rgba(0,0,0, 0)'
+                                    }
+                                ], false),
+                                shadowColor: '#b5b0ee', //阴影颜色
+                                shadowBlur: 40 //shadowBlur设图形阴影的模糊大小。配合shadowColor,shadowOffsetX/Y, 设置图形的阴影效果。
+                            }
+                        },
+                        data: data.values
+                    },
+                        {
+                            name: '预警数量',
+                            type: 'line',
+                            smooth: true, //是否平滑曲线显示
+                            // 			symbol:'circle',  // 默认是空心圆（中间是白色的），改成实心圆
+                            showAllSymbol: true,
+                            symbol: 'emptyCircle',
+                            symbolSize: 6,
+                            lineStyle: {
+                                normal: {
+                                    color: "red", // 线条颜色
+                                },
+                                borderColor: 'purple'
+                            },
+                            label: {
+                                show: true,
+                                position: 'top',
+                                textStyle: {
+                                    color: 'black',
+                                }
+                            },
+                            itemStyle: {
+                                normal: {
+                                    color: "red",
+
+                                }
+                            },
+                            tooltip: {
+                                show: true
+                            },
+                            areaStyle: { //区域填充样式
+                                normal: {
+                                    //线性渐变，前4个参数分别是x0,y0,x2,y2(范围0~1);相当于图形包围盒中的百分比。如果最后一个参数是‘true’，则该四个值是绝对像素位置。
+                                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                        offset: 0,
+                                        color: 'red'
+                                    },
+                                        {
+                                            offset: 1,
+                                            color: 'rgba(0,0,0, 0)'
+                                        }
+                                    ], false),
+                                    shadowColor: '#b5b0ee', //阴影颜色
+                                    shadowBlur: 40 //shadowBlur设图形阴影的模糊大小。配合shadowColor,shadowOffsetX/Y, 设置图形的阴影效果。
+                                }
+                            },
+                            data: data.warnValues
+                        }]
+                };
+                myChart.setOption(option);
+            },
+            error : function(data) {
+                alert("请求失败, 请刷新重试");
+            }
+        });
+
+
+    };
+
+    function drawDepartmentSummaryGraph() {
+        $.ajax({
+            type: "POST",
+            url: "/index/getDepartmentSummary",
+            async : false,
+            datatype:'json',
+            success : function(list) {
+                var data = JSON.parse(list);
+
+                myChart = echarts.init(document.getElementById('department_summary_div'));
+                option = {
+                    color: ['#3398DB'],
+                    tooltip : {
+                        trigger: 'axis',
+                        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                        }
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis : [
+                        {
+                            type : 'category',
+                            data : data.keys,
+                            axisTick: {
+                                alignWithLabel: true
+                            }
+                        }
+                    ],
+                    yAxis : [
+                        {
+                            type : 'value'
+                        }
+                    ],
+                    series : [
+                        {
+                            "name": "总预警数量",
+                            "type": "bar",
+                            "stack": "总量",
+                            barWidth: '60%',
+                            "itemStyle": {
+                                "normal": {
+                                    "color": "#ff6e88",
+                                    "barBorderRadius": 0,
+                                    "label": {
+                                        "show": true,
+                                        "textStyle": {
+                                            "color": "black"
+                                        },
+                                        "position": "top",
+                                        formatter: function(p) {
+                                            return p.value > 0 ? (p.value) : '';
+                                        }
+                                    }
+                                }
+                            },
+                            "data": data.warnValues
+                        }
+                        ,{
+                            "name": "总检查数量",
+                            "type": "bar",
+                            "stack": "总量",
+                            barWidth: '60%',
+                            "barMaxWidth": 35,
+                            "barGap": "30%",
+                            "itemStyle": {
+                                "normal": {
+                                    "color": "#3398DB",
+                                    "label": {
+                                        "show": true,
+                                        "textStyle": {
+                                            "color": "#fff"
+                                        },
+                                        "position": "insideTop",
+                                        formatter: function(p) {
+                                            return p.value > 0 ? (p.value) : '';
+                                        }
+                                    }
+                                }
+                            },
+                            "data": data.values,
+                        }
+                    ]
+                };
+
+                myChart.setOption(option);
+            },
+            error : function(data) {
+                alert("请求失败, 请刷新重试");
+            }
+        });
+
+    };
+
+    /*function drawVersionUsageRateGraph() {
+        $.ajax({
+            type: "POST",
+            url: "/index/getVersionUsageRate",
+            async : false,
+            datatype:'json',
+            success : function(list) {
+                var data = JSON.parse(list);
+                var _data = [];
+                var _keys = [];
+                for(var i=0;i<data.length;i++){
+                    _data.push({name:data[i].name,value:data[i].value});
+                    _keys.push(data[i].name);
+                }
+                myChart = echarts.init(document.getElementById('version_usage_rate_div'));
+                option = {
+                    title : {
+                        text: '各个版本语料库使用率展示图',
+                        x:'center'
+                    },
+                    tooltip : {
+                        trigger: 'item',
+                        formatter: "{a} <br/>{b} : {c} ({d}%)"
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left',
+                        data: _keys
+                    },
+                    series : [
+                        {
+                            name: '各版本使用率',
+                            type: 'pie',
+                            radius : '55%',
+                            center: ['50%', '60%'],
+                            data:_data,
+                            color: ['#2EC5FD', '#FF999A', '#FFCC67', '#F082EE','#A9F387','#CC5962'],
+                            itemStyle: {
+                                emphasis: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                myChart.setOption(option);
+            },
+            error : function(list) {
+                alert("请求失败, 请刷新重试");
+            }
+        });
+
+    }*/
+
+    function drawTaskTrendGraph() {
+        $.ajax({
+            type: "POST",
+            url: "/index/getTodayWarnNum",
+            async : false,
+            datatype:'json',
+            success : function(list) {
+                var data = JSON.parse(list);
+                console.log(data.keys);
+                myChart = echarts.init(document.getElementById('task_trend_div'));
+
+                option = {
+                    series: [{
+                        name: '刻度',
+                        type: 'gauge',
+                        radius: '80%',
+                        min: 0,
+                        max: 100,
+                        splitNumber: 10, //刻度数量
+                        startAngle: 180,
+                        endAngle: 0,
+                        center: ['50%', '70%'],
+                        axisLine: {
+                            show: false,
+                            lineStyle: {
+                                width: 1,
+                                color: [
+                                    [1, 'rgba(0,0,0,0)']
+                                ]
+                            }
+                        }, //仪表盘轴线
+                        axisLabel: {
+                            show: true,
+                            color: '#3B53A2',
+                            distance: 15,
+                            fontSize: 11,
+                            formatter: '{value}'
+                        }, //刻度标签。
+                        axisTick: {
+                            show: true,
+                            lineStyle: {
+                                color: {
+                                    type: 'radial',
+                                    colorStops: [{
+                                        offset: 0,
+                                        color: '#77C664'
+                                    },
+
+                                        {
+                                            offset: 0.2,
+                                            color: '#2CB7C7'
+                                        },
+
+                                        {
+                                            offset: 0.4,
+                                            color: '#1DB2DD'
+                                        },
+
+                                        {
+                                            offset: 0.6,
+                                            color: '#2D89ED'
+                                        },
+
+                                        {
+                                            offset: 0.8,
+                                            color: '#7765B4'
+                                        },
+
+                                        {
+                                            offset: 1,
+                                            color: 'red'
+                                        }
+                                    ],
+                                    globalCoord: false // 缺省为 false
+                                },
+                                width: 0,
+                                length: 20,
+                            },
+                            length: -5
+                        }, //刻度样式
+                        splitLine: {
+                            show: true,
+                            length: -45,
+                        }, //分隔线样式
+                        detail: {
+                            show: false
+                        },
+                        pointer: {
+                            show: false
+                        }
+                    },
+                        {
+                            type: 'gauge',
+                            radius: '85%',
+                            min: 0,
+                            max: 100,
+                            center: ['50%', '70%'],
+
+                            splitNumber: 0, //刻度数量
+                            startAngle: 180,
+                            endAngle: 0,
+                            axisLine: {
+                                show: true,
+                                lineStyle: {
+                                    width: 25,
+                                    color: [
+                                        [1,
+                                            new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+
+                                                {
+                                                    offset: 0,
+                                                    color: '#77C664'
+                                                },
+
+                                                {
+                                                    offset: 0.2,
+                                                    color: '#2CB7C7'
+                                                },
+
+                                                {
+                                                    offset: 0.4,
+                                                    color: '#1DB2DD'
+                                                },
+
+                                                {
+                                                    offset: 0.6,
+                                                    color: '#2D89ED'
+                                                },
+
+                                                {
+                                                    offset: 0.8,
+                                                    color: '#7765B4'
+                                                },
+
+                                                {
+                                                    offset: 1,
+                                                    color: 'red'
+                                                }
+                                            ])
+                                        ]
+                                    ],
+                                }
+                            },
+                            //分隔线样式。
+                            splitLine: {
+                                show: false,
+                            },
+                            axisLabel: {
+                                show: false
+                            },
+                            axisTick: {
+                                show: false
+                            },
+
+
+                            //仪表盘详情，用于显示数据。
+                            detail: {
+                                show: true,
+                                offsetCenter: [0, 42],
+                                color: 'red',
+                                formatter: function(params) {
+                                    return params
+                                },
+                                textStyle: {
+                                    fontSize: 20
+                                }
+                            },
+                            data: [{
+                                // name: "当日预警数",
+                                value: data.warnValues[0]
+                            }]
+                        }
+                    ]
+                };
+
+
+                myChart.setOption(option);
+            },
+            error : function(data) {
+                alert("请求失败, 请刷新重试");
+            }
+        });
+
+    }
+</script>

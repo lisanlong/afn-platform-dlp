@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>${title}</title>
+
+    <link rel="stylesheet" type="text/css" href="/css/common.css"/>
+    <link rel="stylesheet" href="/js/laypage/skin/laypage.css">
+    <link rel="stylesheet" href="/js/zTree_v3/css/zTreeStyle/zTreeStyle.css" type="text/css"/>
+    <link rel="stylesheet" href="/js/layui-v2.5.4/layui/css/layui.css" type="text/css"/>
+    <link rel="stylesheet" href="/css/lrtk.css" type="text/css"/>
+
+
+</head>
+
+<body>
+
+<!-- 头部   -->
+<div class="header">
+    <h1 class="left"><a href="/home/index.html"><img src="/img/index_07.png"/></a></h1>
+    <ul class="left">
+        <#_login_list  var="obj">
+            <?if(obj.id!=null && obj.id==1){?>
+                <li>
+            <?}else{?>
+                <li style="display:none;">
+            <?}?>
+                <a href="/secret/classify.html">
+                    <img src="/img/secret_03.png">
+                    <span>密级管理</span>
+                </a>
+            </li>
+        </#_login_list>
+        <li>
+            <a href="/task/task_create.html">
+                <img src="/img/task_01.png">
+                <span>批量检查</span>
+            </a>
+        </li>
+        <li>
+            <a href="/test/file_test.html">
+                <img src="/img/test_01.png">
+                <span>单篇检查</span>
+            </a>
+        </li>
+        <#_login_list  var="obj">
+            <?if(obj.id!=null && obj.id==1){?>
+                <li>
+            <?}else{?>
+                <li style="display:none;">
+            <?}?>
+                <a href="/system/term.html">
+                    <img src="/img/user_09.png">
+                    <span>系统配置</span>
+                </a>
+                </li>
+        </#_login_list>
+    </ul>
+    <div class="message">
+        <em><img src="/img/index_05.png"></em>
+        <p>
+            <#_login_list  var="obj">
+                <i>${obj.username}</i>
+            </#_login_list>
+            <span></span>
+        </p>
+        <div class="message_box">
+            <#_login_list  var="obj">
+                <a href="javascript:personalInfo(${obj.id});"><img src="/img/person.png">个人设置</a>
+            </#_login_list>
+            <a href="javascript:logout();"><img src="/img/exit.png">退出</a>
+        </div>
+    </div>
+
+
+</div>
+
+${layoutContent}
+<script type="text/javascript" src="/js/jquery-1.11.3.js"></script>
+<script type="text/javascript" src="/js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="/js/jquery.flexslider-min.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script src="/js/echarts/echarts.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="/js/layer-v2.0/layer/layer.js"></script>
+<script type="text/javascript" src="/js/laypage/laypage.js"></script>
+<script type="text/javascript" src="/js/zTree_v3/js/jquery.ztree.core-3.5.js"></script>
+<script type="text/javascript" src="/js/zTree_v3/js/jquery.ztree.excheck-3.5.js"></script>
+<script type="text/javascript" src="/js/zTree_v3/js/jquery.ztree.exedit-3.5.js"></script>
+<script type="text/javascript" src="/js/layui-v2.5.4/layui/layui.js"></script>
+<script type="text/javascript" src="/js/check.js"></script>
+
+
+<script type="text/javascript">
+    //个人信息
+    function personalInfo(id) {
+        layer.open({
+            type : 2,
+            area : [ '700px', '600px' ],
+            scrollbar: false,
+            //shadeClose: true,
+            fix : true, //不固定
+            title : '个人设置',
+            //skin: 'layui-layer-rim', //加上边框
+            btn: ['保存 ', '关闭'],
+            content : ["/system/user_add_edit.html?type=0&id="+id,'no'],
+            yes: function(index,layer){
+                //得到iframe页的窗口对象
+                var iframeWin = parent.window[layer.find('iframe')[0]['name']];
+                iframeWin.Page();
+            },
+            cancel : function(index) {
+            }
+
+        });
+    }
+    //注销
+    function logout(){
+        $.ajax({
+            type : "post",
+            url : "/logout",
+            data : {
+            },
+            dataType : "json",
+            async : false,
+            success : function(data) {
+                window.location.href = "/login/index.html";
+            }
+        });
+    }
+
+    //参数n为休眠时间，单位为毫秒:
+    function sleep(n) {
+        var start = new Date().getTime();
+        //  console.log('休眠前：' + start);
+        while (true) {
+            if (new Date().getTime() - start > n) {
+                break;
+            }
+        }
+        // console.log('休眠后：' + new Date().getTime());
+    }
+
+
+    //创建加载对象
+    var obj = new loadingImg();
+    //显示加载图片
+    function showLoading(){
+        obj.show();
+    }
+    //隐藏加载图片
+    function hideLoading(){
+        obj.hide();
+    }
+    //加载图片方法（对象）
+    function loadingImg(mySetting){
+        var that = this;
+        if(mySetting == "" || mySetting == undefined || typeof mySetting != "object"){
+            mySetting = {};
+        }
+        //使用时间戳作为空间的ID
+        var targetID = new Date().getTime();
+        this.setting = {
+            //插入图片的容器,使用jquery的查询方式传入参数
+            targetConater : "",
+            //使用图片的地址
+            imgUrl : "/img/loading.gif",
+            //图片显示的 宽度
+            imgWidth : "32px",
+            //图片的默认样式
+            imgClass : "",
+            //生成控件的ID
+            "targetID" : targetID,
+            //显示之前的回调函数
+            beforeShow : function(plugin){
+            },
+            //显示之后的回调函数
+            afterShow : function(plugin,targetID){
+            }
+        }
+        this.setting = $.extend(this.setting, mySetting);
+        //获取屏幕的宽度
+        this.getScreenWidth = function(){
+            return document.documentElement.clientWidth;
+        }
+        //获取屏幕的高度
+        this.getScreenHeight = function (){
+            return document.documentElement.clientHeight;
+        }
+        //显示控件
+        this.show = function(){
+            $("#" + that.setting.targetID).show();
+        }
+        //隐藏控件
+        this.hide = function(){
+            $("#" + that.setting.targetID).hide();
+        }
+        this.init = function(){
+            //显示之前执行回调函数
+            if(typeof that.setting.beforeShow == "function"){
+                that.setting.beforeShow(that);
+            }
+            //存放字符串的变量
+            var targetHTML = $("");
+            //将内容存放到指定的容器中，默认存放到body最底部
+            if(that.setting.targetConater != "" && this.setting.targetConater != undefined){
+                targetHTML = '<div id=\"popBox\"><img width="400px" height="400px" src="' + that.setting.imgUrl + '" class="' + that.setting.imgClass + '" id="' + that.setting.targetID + '" style="display:none;"></div>';
+                $(that.setting.targetConater).html(targetHTML);
+            }else{
+                targetHTML = '<img width="400px" height="400px" src="' + that.setting.imgUrl + '" class="' + that.setting.imgClass + '">';
+                targetHTML = '<div id="' + that.setting.targetID + '" style="display:none;position: absolute;top:25%;left: 42%;height: ' + that.getScreenHeight()+';width:'+that.getScreenWidth()+'">' + targetHTML + '</div>';
+                $("body").append(targetHTML);
+            }
+            //判断用户是否自定义了图片的宽度
+            if(that.setting.imgWidth != "" && that.setting.imgWidth.indexOf("px")>0 ){
+                $("#"+targetID).css("width",that.setting.imgWidth);
+            }
+            //显示之后执行回调函数
+            if(typeof that.setting.afterShow == "function"){
+                that.setting.afterShow(that,targetID);
+            }
+        }
+        this.init();
+    }
+
+/*
+var winWidth = 0; //浏览器宽度
+var winHeight = 0; //浏览器高度
+var zoomHeight = 0; //缩小高度
+
+//函数：获取尺寸
+function buildWindowSize(divName, zoomHeight) {
+
+    //获取窗口宽度
+    if (window.innerWidth) {
+        winWidth = window.innerWidth;
+    } else if ((document.body) && (document.body.clientWidth)) {
+        winWidth = document.body.clientWidth;
+    }
+
+    //获取窗口高度
+    if (window.innerHeight) {
+        winHeight = window.innerHeight;
+    } else if ((document.body) && (document.body.clientHeight)) {
+        winHeight = document.body.clientHeight;
+    }
+
+    //通过深入Document内部对body进行检测，获取窗口大小
+    if (document.documentElement && document.documentElement.clientHeight && document.documentElement.clientWidth) {
+        winHeight = document.documentElement.clientHeight;
+        winWidth = document.documentElement.clientWidth;
+    }
+
+    //修改div高度
+    $(divName).height(winHeight - zoomHeight);
+
+}*/
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,100 @@
+.header ul li:nth-child(2){background: #1239bc;}
+.menu ul li:nth-child(4){background: #1239bc;}
+.menu ul li:nth-child(4) a {color: #fff;}
+/*中间内容区*/
+.nbsy{
+	 /*width: 100%; */
+	height:auto;
+	/*height: 800px;*/
+	padding-left:50px ;
+	padding-right:100px ;
+	background: #eff4f8;
+	position: absolute;
+	top: 120px;
+	left: 230px;
+	/*display: none;*/
+}
+.nbsy span{
+	display: block;
+	margin: 30px 0 40px 0;
+	color: #6495bb;
+}
+.display_area{
+	width: 100%;
+	background: #fff;
+	border: 1px solid #2772d6;
+	padding: 30px 30px;
+	margin-bottom: 40px;
+}
+.nbsy .display_area p{
+	position: absolute;
+	top: 118px;
+	right: 60px;
+}
+.nbsy .display_area h3{
+	font-size: 16px;
+	font-weight: 600;
+	color: #333;
+	margin-bottom: 30px;
+}
+.nbsy input{
+	border: none;
+	width: 70px;
+	height: 30px;
+	border-radius: 4px;
+	background: #fff;
+	border: 1px solid #2a58f4;
+	color: #31478f;
+	margin: 0 7px;
+	font-size: 12px;
+	
+}
+.nbsy table{
+	/*height: 100%;*/
+	background: #fff;
+	/*border: 1px solid #2772d6;*/
+	margin-bottom: 10px;
+	/*padding: 80px 0 0;*/
+	table-layout: fixed;
+}
+.nbsy table th{
+	height: 46px;
+	background: #416df9;
+	font-size: 16px;
+	color: #fff;
+	
+}
+.nbsy table th input,.nbsy table tr input{
+	width: 12px;
+	height: 12px;
+	background: #fff;
+	border: 1px solid #317df5;
+	
+}
+.nbsy table tr{
+	height: 40px;
+	text-align: center;
+	font-size: 14px;
+	box-shadow: 1px 1px 4px #f1f1f1;
+}
+.nbsy table tr td{padding: 5px 0;}
+.nbsy table tr td button{
+	width: 80px;
+	height: 22px;
+	background: #fff;
+	border: 1px solid #2a58f4;
+	margin: 3px 7px;
+	font-size: 12px;
+}
+.nbsy  #pageNum{
+    height: 60px;
+    text-align: center;
+  }
+.nbsy  #pageNum p{display: inline-block;}
+.nbsy  #pageNum p  a{
+            height: 24px;
+            margin: 0 10px;
+            color: #2249ba;
+       	 }    
+.nbsy   #pageNum .pageNum_R input{width: 20px;height: 16px;}
+.nbsy #pageNum .pageNum_R  a{ width: 20px;height: 16px; border: 1px solid #999; margin-left: 10px;color: #333;}

@@ -1,0 +1,28 @@
+
+#  cloud:
+#    config:
+#      label: master
+#      profile: dev
+#      name: config-repo
+#      discovery:
+#        enabled: true
+#        protocol-id: cloud-platform-server-config
+#      username: ${security.user.name}
+#      password: ${security.user.password}
+
+eureka:
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+    metadata-map:
+      user.name: ${security.user.name}
+      user.password: ${security.user.password}
+  client:
+    service-url:
+      defaultZone: http://${security.user.name}:${security.user.password}@${eureka.instance.hostname}:8761/eureka/
+
+security:
+  user:
+    name: user
+    password: ${REGISTRY_SERVER_PASSWORD:password}
+

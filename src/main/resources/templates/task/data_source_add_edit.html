@@ -1,0 +1,187 @@
+<?
+	layout("/inc/win_layout.html",{title:"文档安全检查工具-数据源管理",htmlType:"index",pageName:"win_index"}){
+?>
+<div id="popBox">
+    <div class="content">
+        <label>数据源名称:</label>
+        <input id="name" name="name" type="text" placeholder="请输入数据源名称">
+        <br/>
+        <label>数据源描述:</label>
+        <input id="detail" name="detail" type="text" placeholder="请输入数据源描述">
+        <br/>
+        <label>数据源资源类型:</label>
+        <select id="sourceType">
+            <option value="">--请选择数据库资源类型--</option>
+        </select>
+        <br/>
+        <label>状态:</label>
+        <select id="isStoped">
+            <option value="0">启用</option>
+            <option value="1">禁用</option>
+        </select>
+        <br>
+        <div id="sqlDataBase" style="display:none">
+            <label>请输入数据库用户名:</label>
+            <input id="username" name="username" type="text" placeholder="请输入数据库用户名"/>
+            <br/>
+            <label>请输入数据库密码:</label>
+            <input id="password" name="password" type="password" placeholder="请输入数据库密码"/>
+            <br/>
+            <label>请输入数据库链接:</label>
+            <input id="url" name="url" type="text" placeholder="请输入数据库链接"/>
+            <br/>
+            (例: jdbc:mysql://127.0.0.1:3306/test?characterEncoding=UTF-8  )
+            <br/>
+            <input type="button" value="测试数据源" onclick="checkSecDataSrc()"/>
+            <br/>
+        </div>
+    </div>
+
+</div>
+<?
+}
+?>
+
+<script type="text/javascript">
+    $(function() {
+        getDataSourceTypeMap();
+        console.log(GetQueryString('id') + " <........................");
+        if(GetQueryString('id') !=0 & GetQueryString('id') != 'undefined'){
+            getDatabase();
+        }
+    });
+
+    function getDataSourceTypeMap() {
+        $.ajax({
+            type: "POST",
+            url: "/task/getDataSourceTypeMap",
+            dataType : "json",
+            async : false,
+            success: function(list){
+                // 转化为字符串
+                var data = $.parseJSON(JSON.stringify(list));
+                $.each(data, function(i, item){
+                    console.log(item + " < ============= > " + i);
+                    $("#sourceType").append("<option value=\""+item.key+"\">"+item.value+"</option>");
+                });
+            }
+        });
+    }
+
+    function checkSecDataSrc() {
+        var username = $.trim($("#username").val());
+        var password = $.trim($("#password").val());
+        var url = $.trim($("#url").val());
+        var sourceType = $.trim($("#sourceType").children('option:selected').text());
+        $.ajax({
+            type: "POST",
+            url: "/task/checkSecDataSrc",
+            dataType : "json",
+            data: {'sourceType':sourceType, 'username':username, 'password':password, 'url':url},
+            success: function(data){
+                if(data[0].code === '1') {
+                    alert("测试通过!!!");
+                } else{
+                    alert("测试未通过,请联系管理员");
+                }
+            }
+        });
+    };
+
+    function GetQueryString(name){
+        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if(r!=null)return  encodeURI(r[2]); return null;
+    }
+
+
+    function Page() {
+        if ($.trim($("#name").val()).length < 1) {
+            layer.msg('数据源名称不能为空');
+            return null;
+        }
+        if ($.trim($("#sourceType").val()).length < 1) {
+            layer.msg('数据源资源类型不能为空');
+            return null;
+        }
+        /*if($("#sourceType").val() > '0') {
+            if ($.trim($("#username").val()).length < 1) {
+                layer.msg('数据源用户名不能为空');
+                return null;
+            }if ($.trim($("#password").val()).length < 1) {
+                layer.msg('数据源密码不能为空');
+                return null;
+            }if ($.trim($("#url").val()).length < 1) {
+                layer.msg('数据源链接不能为空');
+                return null;
+            }
+        }*/
+        $.ajax({
+            type : "post",
+            url : "/task/addOrEditDatasource",
+            data : {
+                "id":GetQueryString("id"),
+                "name" :$.trim($("#name").val()),
+                "detail" :$.trim($("#detail").val()),
+                "isStoped" :$.trim($("#isStoped").val()),
+                "sourceType" :$.trim($("#sourceType").val()),
+                "username" :$.trim($("#username").val()),
+                "password" :$.trim($("#password").val()),
+                "url" :$.trim($("#url").val())
+            },
+            dataType : "json",
+            async : false,
+            success : function(data) {
+                if(data[0].type=='false'){
+                    layer.msg('名称重复');
+                }else{
+                    parent.layer.msg('保存成功');
+                    var index = parent.layer.getFrameIndex(window.name);
+                    window.parent.getDataSourceList();
+                    parent.layer.close(index);
+                }
+            },
+            error : function(data) {
+                alert("请求失败");
+            }
+        });
+    }
+    //数据回显
+    function getDatabase() {
+        $.ajax({
+            type : "post",
+            url : "/task/getDatabase",
+            dataType : "json",
+            async:false,
+            data :{
+                "id":GetQueryString('id')
+            },
+            success : function(res) {
+                console.log(res[0].sourceType);
+                // $("#sourceType").text(res[0].sourceType).trigger("change");
+                $("#name").val(res[0].name);
+                $("#detail").val(res[0].detail);
+                $("#isStoped").val(res[0].isStoped);
+                $("#sourceType").val(res[0].sourceType);
+                $("#username").val(res[0].user);
+                $("#password").val(res[0].password);
+                $("#url").val(res[0].url);
+                if($("#sourceType").val() > '0') {
+                    $("#sqlDataBase").attr("style", "display:block");
+                }else{
+                    $("#sqlDataBase").attr("style", "display:none");
+                }
+            }
+        });
+    };
+
+    $("#sourceType").change(function(){
+        $("#sqlDataBase").attr("style", "display:none");
+        var sourceType = $("#sourceType").children('option:selected').val();
+        console.log("=====================> " + sourceType);
+        if(sourceType > '0') {
+            $("#sqlDataBase").attr("style", "display:block");
+        }
+    });
+
+</script>

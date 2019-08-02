@@ -1,0 +1,137 @@
+<?
+	layout("/inc/win_layout.html",{title:"统一检索系统",htmlType:"index",pageName:"win_index"}){
+?>
+
+
+<div id="cl-wrapper" class="fixed-menu" style="padding-top: 0px;  ">
+
+    <div class="container-fluid" id="pcont">
+        <div class="cl-mcont" >
+
+            <!-- row start -->
+            <div class="row dash-cols">
+
+                <div class="col-lg-12">
+
+                    <div class="block-flat">
+                        <div class="header">
+                            <h5>Tips</h5>
+                        </div>
+                        <div class="content">
+                            <p>表单提示信息。</p>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+                <div class="col-lg-12">
+                    <div class="block-flat">
+                        <div class="header">
+                            <h5>编辑项目</h5>
+                        </div>
+                        <div class="content">
+                            <div class="form-horizontal" role="form">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">输入框</label>
+                                    <div class="col-sm-8">
+                                        <input id="nameCn" name="nameCn" type="text" class="form-control" placeholder="请输入中文名称">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">输入框</label>
+                                    <div class="col-sm-8">
+                                        <input id="nameEn" name="nameEn" type="text" class="form-control" placeholder="请输入英文名称">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">下拉菜单</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control">
+                                            <option value="">---请选择---</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">文本域</label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" style="height: 60px;" id="description" name="description" placeholder="输入任务描述"></textarea>
+                                    </div>
+                                </div>
+                                <input id="status" name=" status" type="hidden" value="0" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- row end -->
+        </div>
+    </div>
+</div>
+
+
+<?
+}
+?>
+
+
+<script type="text/javascript">
+    var projectAddEditId = window.parent.getProjectAddEditId();
+    $(function() {
+        if(projectAddEditId != '0'){
+            demo();
+        }
+    });
+    function Page() {
+        if ($.trim($("#nameCn").val()).length < 1) {
+            alert('中文名称不能为空！');
+            return null;
+        }
+        if ($.trim($("#nameEn").val()).length < 1) {
+            alert('英文名称不能为空！');
+            return null;
+        }
+        $.ajax({
+            type : "post",
+            url : "/projectAddEdit",
+            data : {
+                "id" : projectAddEditId,
+                "nameCn" : $("#nameCn").val(),
+                "nameEn" : $("#nameEn").val(),
+                "description" : $("#description").val(),
+                "status" : $("#status").val(),
+            },
+            dataType : "json",
+            async : false,
+            success : function(data) {
+                var index = parent.layer.getFrameIndex(window.name);
+                window.parent.getProjectAll();
+                parent.layer.msg('提交成功');
+                parent.layer.close(index);
+            },
+            error : function(data) {
+                alert("请求失败");
+            }
+        });
+    }
+    function demo() {
+        $.ajax({
+            type : "post",
+            url : "/findProjecAddEdit",
+            dataType : "json",
+            data :{
+                "id":projectAddEditId
+            },
+            beforeSend : function(XMLHttpRequest) {},
+            success : function(res) {
+                    $("#nameCn").val(res[0].nameCn);
+                    $("#nameEn").val(res[0].nameEn);
+                    $("#description").val(res[0].description);
+                    $("#status").val(res[0].status);
+            }
+        });
+    };
+</script>
+

@@ -1,0 +1,102 @@
+<?
+	layout("/inc/layout.html",{title:"统一检索系统-项目管理",htmlType:"index",pageName:"manager_index"}){
+?>
+
+
+<div id="cl-wrapper" class="fixed-menu">
+
+	<div class="container-fluid" id="pcont">
+		<div class="cl-mcont">
+
+			<!-- row start -->
+			<div class="row dash-cols">
+
+
+				<div class="col-sm-6 col-md-6 col-lg-12">
+					<div class="content">
+						<div class="form-horizontal" role="form">
+							<div class="form-group">
+								<label class="col-sm-1 control-label">用户类型：</label>
+								<div class="col-sm-2">
+									<select class="form-control">
+										<option value="">---请选择---</option>
+									</select>
+								</div>
+								<label class="col-sm-1 control-label">用户名：</label>
+								<div class="col-sm-2">
+									<input id="username" type="text" class="form-control" placeholder="请输入字符串">
+								</div>
+								<label class="col-sm-1 control-label">真实姓名：</label>
+								<div class="col-sm-2">
+									<input id="searchText" type="text" class="form-control" placeholder="请输入字符串">
+								</div>
+
+								<button class="btn btn btn-success" onclick="">按条件搜索</button>
+								<button class="btn btn btn-success" onclick="">创建任务</button>
+
+							</div>
+							 
+
+
+						</div>
+					</div>
+
+
+				</div>
+
+				<div class="col-sm-6 col-md-6 col-lg-12">
+
+
+					<div class="table-responsive">
+						<table class="table table-bordered" id="datatable">
+							<thead>
+							<tr>
+								<th>序号</th>
+								<th>字段名称</th>
+								<th>字段名称</th>
+								<th>字段名称</th>
+								<th>状态</th>
+								<th>创建人</th>
+								<th>创建时间</th>
+								<th>可操作</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr>
+								<td>1</td>
+								<td>字段值</td>
+								<td>字段值</td>
+								<td>字段值</td>
+								<td>
+									<span class="label label-success">正常</span>
+									<span class="label label-danger">禁用</span>
+								</td>
+								<td>创建人</td>
+								<td>创建时间</td>
+								<td>
+									<button class="btn btn-sm btn-info" type="button">编辑</button>
+									<button class="btn btn-sm btn-info" type="button">删除</button>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+					<div id="page" style="text-align: center; margin-top: 20px;">分页</div>
+
+				</div>
+
+			</div>
+			<!-- row end -->
+
+		</div>
+	</div>
+
+</div>
+
+
+<?
+}
+?>
+<script type="text/javascript">
+
+</script>

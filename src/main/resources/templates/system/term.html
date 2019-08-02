@@ -1,0 +1,311 @@
+<?
+layout("/inc/layout.html",{title:"文档安全检查工具-密级管理",htmlType:"index",pageName:"home_index"}){
+?>
+<link rel="stylesheet" type="text/css" href="/css/term.css"/>
+<style>
+	.menu a:nth-child(1){background: #1239bc;}
+	.menu a:nth-child(1) em {color: #fff;}
+</style>
+		<div class="exhibit">
+			<div class="menu">
+				<a href="term.html">
+					<img src="/img/secret_05.png">
+					<em>专业术语管理</em>
+				</a>
+				<a href="task_source.html">
+					<img src="/img/task_03.png">
+					<em>数据源管理</em>
+				</a>
+				<a href="user.html">
+					<img src="/img/system_02.png">
+					<em>用户管理</em>
+				</a>
+				<a href="department.html">
+					<img src="/img/system_06.png">
+					<em>部门管理</em>
+				</a>
+				<a href="log.html">
+					<img src="/img/system_08.png">
+					<em>日志管理</em>
+				</a>
+			</div>
+		<div class="nbsy">
+			<span class="spanhead"><a href="../home/index.html">首页 ></a><a href="term.html">系统配置 </a> >  专业术语管理  </span>
+			<p  class="right" href="#">
+
+			<span id="pubsp" style="display: none;">未发布数：<em id="pubem" style="font-weight: bold;color: red;font-size: 20px;margin-right: 10px;">0</em></span>
+			<input type="button" onclick="goTermClass()" value="分类管理">
+			<input type="button" onclick="addOrEditTerm(0)" value="新增">
+			<input type="button" onclick="updateTermStatus(checkVals(),0)" value="批量启用">
+			<input type="button" onclick="updateTermStatus(checkVals(),1)" value="批量禁用">
+			<input type="button" onclick="delTerm(checkVals())" value="批量删除">
+			<input type="button" onclick="publishTerm()" value="发布">
+			</p>
+			<div>
+			<select id="termclass">
+			</select>
+			<select id="publishStatus">
+				<option value="">--发布状态--</option>
+				<option value="0">未发布</option>
+				<option value="1">已发布</option>
+			</select>
+			<input class="search" type="button" onclick="doSearch()" value="搜索">
+			</div>
+			<table width="100%" cellspacing="0" cellpadding="0">
+				<thead class="table_head">
+					<tr>
+						<th width="5%"><input type="checkbox" class="check check-all"></th>
+						<th width="5%">序号</th>
+						<th width="20%">名称</th>
+						<th width="15%">分类</th>
+						<th width="10%">启用状态</th>
+						<th width="10%">发布状态</th>
+						<th width="10%">创建人</th>
+						<th width="10%">创建时间</th>
+						<th width="10%">操作栏</th>
+					</tr>
+				</thead>
+				<tbody class="table_body" id="termList">
+
+				</tbody>
+			</table>
+			<div id="page" style="text-align: center;"></div>
+			<div id="dataNull" style="height: 90px; line-height: 50px;" align="center"></div>
+		</div>
+	</div>
+
+<?
+}
+?>
+
+<script>
+    var curr = 1;
+    $(function(){
+        getTermClassAll();
+        getTermList();
+        getPublishNum();
+    })
+    function doSearch() {
+        getTermList();
+    }
+    function getPublishNum(){
+        $.ajax({
+            type : "post",
+            url : "/getPublishNum",
+            data : {
+                type:"term",
+                isPublished:0
+            },
+            dataType : "json",
+            success : function(data) {
+                $('#pubem').html(data[0].count);
+                if(data[0].count==0){
+                    $('#pubsp').attr("style","display:none");
+                }else{
+                    $('#pubsp').attr("style","display:inline");
+                }
+            },
+            error : function(data) {
+                alert("请求失败");
+            }
+        });
+    }
+    function getTermClassAll(){
+        $.ajax({
+            type : "post",
+            url : "/getTermClassListAll",
+            data : {
+
+            },
+            dataType : "json",
+            success : function(data) {
+                var str = '<option value="">--全部分类--</option>';
+                for(var i=0;i<data.length;i++){
+					str+='<option value="'+data[i].id+'">'+data[i].name+'</option>';
+				}
+				$("#termclass").html(str);
+            },
+            error : function(data) {
+                alert("请求失败");
+            }
+        });
+    }
+    function getTermList(curr){
+        $.ajax({
+            type : "post",
+            url : "/getTermList",
+            data : {
+                "pageNum":curr||1,
+                "pageSize":15,
+				"termclassId":$("#termclass").val(),
+				"isPublished":$("#publishStatus").val()
+            },
+            dataType : "json",
+            success : function(data) {
+                $('.table_head').find('.check-all').each(function(){
+                    this.checked = false;
+                });
+                if(data[0].data.length>0){
+                    $("#dataNull").html("");
+                }else{
+                    $("#dataNull").html("<span style='font-size: 15px;'>暂无数据</span>");
+                }
+                var str = '';
+                for(var i=0;i<data[0].data.length;i++){
+                    str+='<tr><td><input type="checkbox" class="check check-one" value="'+data[0].data[i].id+'"></td>'
+                        +'<td>'+(((curr||1)-1)*15+i+1)+'</td>'
+                        +'<td>'+data[0].data[i].name+'</td>'
+                        +'<td>'+data[0].data[i].termClass+'</td>'
+                        +'<td>'+(data[0].data[i].isStoped==0?'启用':'禁用')+'</td>'
+                        +'<td>'+(data[0].data[i].isPublished==0?'未发布':'已发布')+'</td>'
+                        +'<td>'+data[0].data[i].createUser+'</td>'
+                        +'<td>'+data[0].data[i].createTime+'</td>'
+                        +'<td><button onclick="addOrEditTerm('+data[0].data[i].id+')">编辑</button><button onclick="delTerm('+data[0].data[i].id+')">删除</button></td></tr>';
+                }
+                $('#termList').html(str);
+                laypage({
+                    cont : "page", //容器。值支持id名、原生dom对象，jquery对象,
+                    pages : data[0].count, //总页数
+                    skip : false, //是否开启跳页
+                    curr : curr || 1,
+                    first: '首页',
+                    last: '尾页',
+                    skin : 'molv', //加载内置皮肤，也可以直接赋值16进制颜色值，如:#c00
+                    groups : 5,//连续显示分页数
+                    jump : function(obj, first) { //触发分页后的回调
+                        if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                            getTermList(obj.curr);
+                            curr=obj.curr;
+                        }
+                    }
+                });
+            },
+            error : function(data) {
+                alert("请求失败");
+            }
+        });
+    }
+    function goTermClass(){
+        layer.open({
+            type : 2,
+            area : [ '800px', '500px' ],
+            scrollbar: false,
+            //shadeClose: true,
+            fix : true, //不固定
+            title : '术语分类',
+            //skin: 'layui-layer-rim', //加上边框
+            btn: ['确定 ', '关闭'],
+            content : ["term_class.html",'no'],
+            yes: function(index,layer){
+                //得到iframe页的窗口对象
+                var iframeWin = parent.window[layer.find('iframe')[0]['name']];
+                iframeWin.Page();
+            },
+            cancel : function(index) {
+            }
+
+        });
+	}
+    function addOrEditTerm(id){
+        layer.open({
+            type : 2,
+            area : [ '500px', '350px' ],
+            scrollbar: false,
+            //shadeClose: true,
+            fix : true, //不固定
+            title : id==0?'新增术语':'编辑术语',
+            //skin: 'layui-layer-rim', //加上边框
+            btn: ['保存 ', '关闭'],
+            content : ["term_add_edit.html?id="+id,'no'],
+            yes: function(index,layer){
+                //得到iframe页的窗口对象
+                var iframeWin = parent.window[layer.find('iframe')[0]['name']];
+                iframeWin.Page();
+            },
+            cancel : function(index) {
+            }
+
+        });
+    }
+    function delTerm(id){
+        if(id==''){
+			layer.msg('请先选择');
+            return;
+		}
+        layer.msg('确定删除吗', {
+            time: 20000,
+            btn: ['确定', '取消']
+            ,yes:function(){
+                $.ajax({
+                    type : "post",
+                    url : "/delTerm",
+                    data : {
+                        id: id,
+                    },
+                    dataType : "json",
+                    success : function(data) {
+                        layer.msg("删除成功");
+                        getTermList();
+                        getPublishNum();
+                    },
+                    error : function(data) {
+                        alert("请求失败");
+                    }
+                });
+            }
+        });
+    }
+
+    function publishTerm(){
+        layer.msg('确定发布吗', {
+            time: 20000,
+            btn: ['确定', '取消']
+            ,yes:function(){
+                layer.msg('请稍后...');
+                $.ajax({
+                    type : "post",
+                    url : "/publishTerm",
+                    data : {
+                    },
+                    dataType : "json",
+                    success : function(data) {
+                        layer.msg("发布成功");
+                        getTermList();
+                        getPublishNum();
+                    },
+                    error : function(data) {
+                        alert("请求失败");
+                    }
+                });
+            }
+        });
+    }
+    function updateTermStatus(id,type){
+        if(id==''){
+            layer.msg('请先选择');
+            return;
+        }
+        layer.msg(type==0?'确定启用吗':'确定禁用吗', {
+            time: 20000,
+            btn: ['确定', '取消']
+            ,yes:function(){
+                $.ajax({
+                    type : "post",
+                    url : "/updateTermStatus",
+                    data : {
+                        id: id,
+                        isStoped: type
+                    },
+                    dataType : "json",
+                    success : function(data) {
+                        layer.msg(type==0?'启用成功':'禁用成功');
+                        getTermList();
+                    },
+                    error : function(data) {
+                        alert("请求失败");
+                    }
+                });
+            }
+        });
+    }
+</script>

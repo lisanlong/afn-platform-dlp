@@ -1,0 +1,283 @@
+<?
+	layout("/inc/layout.html",{title:"文档安全检查工具-记录列表",htmlType:"index",pageName:"home_index"}){
+?>
+<link rel="stylesheet" type="text/css" href="/css/task_warn.css"/>
+<div class="exhibit">
+    <div class="menu left">
+        <!--<a href="task_source.html">
+            <img src="/img/task_03.png">
+            <em>数据源管理</em>
+        </a>-->
+        <a href="task_create.html">
+            <img src="/img/task_06.png">
+            <em>创建任务</em>
+        </a>
+        <a href="task_list.html">
+            <img src="/img/task_08.png">
+            <em>任务列表</em>
+        </a>
+        <a href="task_warn.html">
+            <img src="/img/task_10.png">
+            <em>任务预警</em>
+        </a>
+    </div>
+    <div class="nbsy">
+        <span class="spanhead"><a href="../home/index.html">首页 ></a><a href="task_source.html">任务管理 </a> >  任务预警  </span>
+        <div class="display_area">
+            <h3 id="taskName"></h3>
+            <select id="checkStatus">
+                <option value="">--预警状态--</option>
+                <option value="1">正常</option>
+                <option value="2">预警</option>
+            </select>
+            <select id="taskGroup">
+                <option value="">--选择任务--</option>
+
+            </select>
+            <input class="search" type="button" onclick="getTargetResult()" value="搜索">
+            <table width="100%" cellspacing="0" cellpadding="0">
+                <th width="0%"><input type="hidden" class="check check-all"></th>
+                <th width="5%">序号</th>
+                <th width="20%">文件名称</th>
+                <th width="16%">任务名称</th>
+                <th width="8%">原始密级</th>
+                <th width="8%">预测密级</th>
+                <th width="8%">确认密级</th>
+                <th width="5%">状态</th>
+                <th width="10%">创建人</th>
+                <th width="10%"> 创建时间</th>
+                <th width="10%">操作栏</th>
+                <tbody class="table_body" id="taskList">
+                </tbody>
+            </table>
+            <div id="page" style="text-align: center;"></div>
+            <div id="dataNull" style="height: 90px; line-height: 50px;" align="center"></div>
+        </div>
+    </div>
+</div>
+<?
+}
+?>
+
+<script>
+    var requestId;
+    var checkStatus;
+    var curr = 1;
+    var taskId;
+    $(function() {
+        requestId = GetRequest().id;
+        getWarnRecordList(curr);
+        // console.log(GetRequest().checkStatus + "<================");
+        if(GetRequest().checkStatus != '') {
+            $("#checkStatus").val(GetRequest().checkStatus);
+            checkStatus = GetRequest().checkStatus;
+            console.log($("#checkStatus").val() + "<================");
+        }
+        getTaskLisk();
+    })
+
+    // 查询所有的任务
+    function getTaskLisk() {
+        $.ajax({
+            type: "POST",
+            url: "/task/getAllTaskList",
+            async : false,
+            datatype:'json',
+            success : function(list) {
+                var data = $.parseJSON(list);
+                if(data.length == 0){
+                    $("#taskGroup").html("<option value=\"\">--选择任务--</option>");
+                } else {
+                    // 返回的结果不为空
+                    $.each(data, function(i, item){
+                        $("#taskGroup").append("<option value=\""+ item.value +"\">"+item.key+"</option>");
+                    });
+                }
+            },
+            error : function(list) {
+                alert("请求失败, 请刷新重试");
+            }
+        });
+    }
+
+    // 根据请求的不同返回不同的界面
+    function getTargetResult() {
+            checkStatus = $("#checkStatus").val();
+            console.log((checkStatus == 2) + " <================");
+            getWarnRecordList(curr);
+    }
+    // 获取请求参数
+    function GetRequest() {
+        var url = location.search; //获取url中"?"符后的字串
+        var theRequest = new Object();
+        if (url.indexOf("?") != -1) {
+            var str = url.substr(1);
+            strs = str.split("&");
+            for(var i = 0; i < strs.length; i ++) {
+                theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);
+            }
+        }
+        return theRequest;
+    }
+
+    // 预览任务
+    function checkRecordReview(id){
+        layer.open({
+            type : 2,
+            area : [ '800px', '600px' ],
+            scrollbar: true,
+            shadeClose: true,
+            fix : true, //不固定
+            title : '任务预览',
+            skin: 'layui-layer-rim', //加上边框
+            btn: ['关闭'],
+            content : ["task_record_view.html?id="+id,'no'],
+            yes: function(index,layero){
+                layer.close(index);
+            },
+            cancel : function(index) {
+            }
+        });
+    }
+
+    // 标记任务
+    function checkRecordMark(id) {
+        layer.open({
+            type : 2,
+            area : [ '800px', '600px'],
+            scrollbar: true,
+            shadeClose: true,
+            fix : true, //不固定
+            title : '任务标记',
+            skin: 'layui-layer-rim', //加上边框
+            btn: ['保存 ', '关闭'],
+            content : ["task_record_mark.html?id="+id,'no'],
+            yes: function(index){
+                var res = window["layui-layer-iframe" + index].callbackdata();
+                // res = JSON.stringify(res);
+                // var val = layero.getElementById("recordMark").val();
+                console.log("==============> " + res);
+                $.ajax({
+                    type : "post",
+                    url : "/task/recordReview",
+                    data : res,
+                    dataType : "json",
+                    success : function(data) {
+                        if(null != data[0].result) {
+                            console.log(data[0].result);
+                            layer.msg(data[0].result);
+                        }
+                    },
+                    error : function(data) {
+                        alert("请求失败");
+                    }
+                });
+                parent.layer.msg("操作成功!", {time: 1000}, function () {
+                    //重新加载父页面
+                    getWarnRecordList(curr);
+                    layer.close(index);
+                });
+                return;
+            },
+            cancel : function(index) {
+            }
+        });
+    }
+
+    function clearSearchParams() {
+        var url=window.location.href;                    //获取当前页面的url
+        if(url.indexOf("?")!=-1){                        //判断是否存在参数
+            url = url.replace(/(\?|#)[^'"]*/, '');           //去除参数
+            window.history.pushState({},0,url);
+        }
+    }
+
+    function getWarnRecordList(curr){
+        var reviewStatus = "";
+        if(GetRequest().checkStatus != undefined) {
+            console.log(GetRequest().checkStatus + "///////")
+            checkStatus = GetRequest().checkStatus;
+            clearSearchParams();
+        } else if(GetRequest().reviewStatus != undefined) {
+            reviewStatus = GetRequest().reviewStatus;
+            checkStatus = 2;
+            console.log(checkStatus + ".....");
+            clearSearchParams();
+        }
+        taskId = $("#taskGroup").val();
+        console.log();
+        var wait = layer.load();
+        $.ajax({
+            type : "post",
+            url : "/task/getWarnRecordList",
+            data : {
+                "pageNum":curr||1,
+                "pageSize":10,
+                "checkStatus":checkStatus,
+                "taskId":taskId,
+                "reviewStatus":reviewStatus
+            },
+            dataType : "json",
+            success : function(data) {
+                layer.close(wait);
+                if(data[0].data.length>0){
+                    $("#dataNull").html("");
+                }else{
+                    $("#dataNull").html("<span style='font-size: 15px;'>暂无数据</span>");
+                }
+                var str = '';
+                for(var i=0;i<data[0].data.length;i++){
+                    str+='<tr><td><input type="hidden" name="id" class="check check-one" value="'+data[0].data[i].id + '">' +
+                        '<input type="hidden" name="checkStatus" value="'+data[0].data[i].checkStatus+'"/></td>'
+                        +'<td>'+(((curr||1)-1)*10+i+1)+'</td>'
+                        +'<td>'+data[0].data[i].fileName+'</td>'
+                        +'<td>'+data[0].data[i].taskName+'</td>'
+                        +'<td>'+data[0].data[i].originLabel+'</td>'
+                        +'<td>'+data[0].data[i].checkLabel+'</td>'
+                        +'<td>'+data[0].data[i].reviewLabel+'</td>'
+                        +'<td>'+data[0].data[i].status+'</td>'
+                        +'<td>'+data[0].data[i].createUser+'</td>'
+                        +'<td>'+data[0].data[i].createTime+'</td>'
+                    +'</tr>';
+                }
+
+                $('#taskList').html(str);
+                laypage({
+                    cont : "page", //容器。值支持id名、原生dom对象，jquery对象,
+                    pages : data[0].count, //总页数
+                    skip : false, //是否开启跳页
+                    curr : curr || 1,
+                    first: '首页',
+                    last: '尾页',
+                    skin : 'molv', //加载内置皮肤，也可以直接赋值16进制颜色值，如:#c00
+                    groups : 5,//连续显示分页数
+                    jump : function(obj, first) { //触发分页后的回调
+                        if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                            getWarnRecordList(obj.curr);
+                            curr=obj.curr;
+                        }
+                    }
+                });
+
+                // 动态显示操作栏
+                $("#taskList tr").each(function(){
+                    //使用children（）定位到<tr></tr>中的指定<td></td>
+                    var id = $(this).children("td").children("input[name=id]").val();
+                    var checkStatus = $(this).children("td").children("input[name=checkStatus]").val();
+                    // console.log(checkStatus + "<--------------> " + id);
+                    // if(checkStatus == 2) {
+                        $(this).append('<td><button onclick="checkRecordReview('+id+')">预览</button><button onclick="checkRecordMark('+id+')">标注</button></td>');
+                    // } else {
+                    //     $(this).append('<td><button onclick="checkRecordReview('+id+')">预览</button></td>');
+                    // }
+                });
+
+            },
+            error : function(data) {
+                layer.close(wait);
+                alert("请求失败");
+            }
+        });
+    }
+
+</script>

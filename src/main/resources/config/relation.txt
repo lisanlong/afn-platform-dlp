@@ -1,0 +1,4 @@
+weapon_belongto_country 兵器_国家
+weapon_belongto_category 兵器_兵器分类
+term_belongto_category 术语_术语分类
+term_include_weapon 术语_兵器

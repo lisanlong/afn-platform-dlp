@@ -1,0 +1,12 @@
+aircraft 飞行器
+warship 舰船舰艇
+guns 枪械与单兵
+tank 坦克装甲车辆
+artillery 火炮
+missile 导弹武器
+spaceship 太空装备
+explosive 爆炸物
+term 军事术语
+country 国别
+weapon_category 兵器分类
+term_category 术语分类

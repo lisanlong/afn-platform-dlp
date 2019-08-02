@@ -1,0 +1,187 @@
+<?
+layout("/inc/layout.html",{title:"文档安全检查工具-系统配置",htmlType:"index",pageName:"home_index"}){
+?>
+<link rel="stylesheet" type="text/css" href="/css/user.css"/>
+<style>
+	.menu a:nth-child(3){background: #1239bc;}
+	.menu a:nth-child(3) em {color: #fff;}
+</style>
+<!--内容区-->
+<div class="exhibit">
+	<div class="menu">
+		<a href="term.html">
+			<img src="/img/secret_06.png">
+			<em>专业术语管理</em>
+		</a>
+		<a href="task_source.html">
+			<img src="/img/task_03.png">
+			<em>数据源管理</em>
+		</a>
+		<a href="user.html">
+			<img src="/img/system_01.png">
+			<em>用户管理</em>
+		</a>
+		<a href="department.html">
+			<img src="/img/system_06.png">
+			<em>部门管理</em>
+		</a>
+		<a href="log.html">
+			<img src="/img/system_08.png">
+			<em>日志管理</em>
+		</a>
+	</div>
+	<div class="nbsy">
+		<span><a href="../home/index.html">首页 ></a><a href="term.html">系统配置 </a> >  用户管理  </span>
+		<div class="display_area">
+			<select id="queryParam">
+				<option value="username">用户名</option>
+				<option value="nickname">昵称</option>
+				<option value="telephone">手机号</option>
+			</select>
+			<input class="search_box" type="text" id="searchText">
+			<input class="search" type="button" onclick="getSystemUserList()" value="搜索">
+			<table width="100%" cellspacing="0" cellpadding="0">
+				<p class="right" href="#">
+					<input type="button" onclick="addOrEditSystemUser(0)" value="新增">
+					<input type="button" onclick="delSystemUser(checkVals())" value="批量删除">
+				</p>
+				<thead class="table_head">
+				<tr>
+					<th width="5%"><input type="checkbox" class="check check-all"></th>
+					<th width="5%">序号</th>
+					<th width="5%">用户名</th>
+					<th width="10%">昵称</th>
+					<th width="10%">部门</th>
+					<th width="20%">手机号</th>
+					<th width="20%">邮箱</th>
+					<th width="10%">创建时间</th>
+					<th width="15%">可操作</th>
+				</tr>
+				</thead>
+				<tbody class="table_body" id="userList">
+
+				</tbody>
+			</table>
+			<div id="page" style="text-align: center;"></div>
+			<div id="dataNull" style="height: 90px; line-height: 50px;" align="center"></div>
+		</div>
+	</div>
+</div>
+<?
+}
+?>
+<script>
+    var curr = 1;
+    $(function(){
+        getSystemUserList();
+    })
+    function getSystemUserList(curr){
+        $.ajax({
+            type : "post",
+            url : "/getSystemUserList",
+            data : {
+                "pageNum":curr||1,
+                "pageSize":15,
+				"queryParam":$("#queryParam").val(),
+				"searchText":$("#searchText").val()
+            },
+            dataType : "json",
+            success : function(data) {
+                $('.table_head').find('.check-all').each(function(){
+                    this.checked = false;
+                });
+                if(data[0].data.length>0){
+                    $("#dataNull").html("");
+                }else{
+                    $("#dataNull").html("<span style='font-size: 15px;'>暂无数据</span>");
+                }
+                var str = '';
+                for(var i=0;i<data[0].data.length;i++){
+                    var check ='';
+                    var del ='';
+                    if(data[0].data[i].id!='1'){
+						check = '<input type="checkbox" class="check check-one" value="'+data[0].data[i].id+'">';
+                        del = '<button onclick="delSystemUser('+data[0].data[i].id+')">删除</button>';
+                    }
+					str+='<tr><td>'+check+'</td>'
+						+'<td>'+(((curr||1)-1)*15+i+1)+'</td>'
+						+'<td>'+data[0].data[i].username+'</td>'
+						+'<td>'+data[0].data[i].nickname+'</td>'
+						+'<td>'+data[0].data[i].department+'</td>'
+                        +'<td>'+data[0].data[i].telephone+'</td>'
+                        +'<td>'+data[0].data[i].email+'</td>'
+						+'<td>'+data[0].data[i].createTime+'</td>'
+						+'<td><button onclick="addOrEditSystemUser('+data[0].data[i].id+')">编辑</button>'+del+'</td></tr>';
+                }
+                $('#userList').html(str);
+                laypage({
+                    cont : "page", //容器。值支持id名、原生dom对象，jquery对象,
+                    pages : data[0].count, //总页数
+                    skip : false, //是否开启跳页
+                    curr : curr || 1,
+                    first: '首页',
+                    last: '尾页',
+                    skin : 'molv', //加载内置皮肤，也可以直接赋值16进制颜色值，如:#c00
+                    groups : 5,//连续显示分页数
+                    jump : function(obj, first) { //触发分页后的回调
+                        if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                            getSystemUserList(obj.curr);
+                            curr=obj.curr;
+                        }
+                    }
+                });
+            },
+            error : function(data) {
+                alert("请求失败");
+            }
+        });
+    }
+    function addOrEditSystemUser(id){
+        layer.open({
+            type : 2,
+            area : [ '700px', '600px' ],
+            scrollbar: false,
+            //shadeClose: true,
+            fix : true, //不固定
+            title : id==0?'新增用户':'编辑用户',
+            //skin: 'layui-layer-rim', //加上边框
+            btn: ['保存 ', '关闭'],
+            content : ["user_add_edit.html?id="+id,'no'],
+            yes: function(index,layer){
+                //得到iframe页的窗口对象
+                var iframeWin = parent.window[layer.find('iframe')[0]['name']];
+                iframeWin.Page();
+            },
+            cancel : function(index) {
+            }
+
+        });
+    }
+    function delSystemUser(id){
+        if(id==''){
+            layer.msg('请先选择');
+            return;
+        }
+        layer.msg('确定删除吗', {
+            time: 20000,
+            btn: ['确定', '取消']
+            ,yes:function(){
+                $.ajax({
+                    type : "post",
+                    url : "/delSystemUser",
+                    data : {
+                        id: id,
+                    },
+                    dataType : "json",
+                    success : function(data) {
+                        layer.msg("删除成功");
+                        getSystemUserList();
+                    },
+                    error : function(data) {
+                        alert("请求失败");
+                    }
+                });
+            }
+        });
+    }
+</script>

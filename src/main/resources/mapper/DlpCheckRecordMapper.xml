@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cloud.framework.mapper.DlpCheckRecordMapper">
+
+    <!-- 开启二级缓存 -->
+    <cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="org.cloud.framework.model.DlpCheckRecord">
+        <id column="id" property="id" />
+        <result column="file_id" property="fileId" />
+        <result column="file_bar_code" property="fileBarCode" />
+        <result column="file_name" property="fileName" />
+        <result column="file_source" property="fileSource" />
+        <result column="file_type" property="fileType" />
+        <result column="file_size" property="fileSize" />
+        <result column="file_disk_path" property="fileDiskPath" />
+        <result column="origin_label" property="originLabel" />
+        <result column="content" property="content" />
+        <result column="feature" property="feature" />
+        <result column="predict_type" property="predictType" />
+        <result column="cwords" property="cwords" />
+        <result column="create_time" property="createTime" />
+        <result column="create_uid" property="createUid" />
+        <result column="dpt_id" property="dptId" />
+        <result column="task_id" property="taskId" />
+        <result column="check_time" property="checkTime" />
+        <result column="check_status" property="checkStatus" />
+        <result column="check_label" property="checkLabel" />
+        <result column="check_detail" property="checkDetail" />
+        <result column="review_label" property="reviewLabel" />
+        <result column="review_status" property="reviewStatus" />
+        <result column="review_uid" property="reviewUid" />
+        <result column="review_time" property="reviewTime" />
+        <result column="review_detail" property="reviewDetail" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, file_id, file_bar_code, file_name, file_source, file_type, file_size, file_disk_path, origin_label, content, feature, predict_type, cwords, create_time, create_uid, dpt_id, task_id, check_time, check_status, check_label, check_detail, review_label, review_status, review_uid, review_time, review_detail
+    </sql>
+
+</mapper>

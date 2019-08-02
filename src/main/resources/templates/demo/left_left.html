@@ -1,0 +1,95 @@
+<?
+	layout("/inc/layout.html",{title:"统一检索系统-项目管理",htmlType:"index",pageName:"manager_index"}){
+?>
+
+
+<div id="cl-wrapper" class="fixed-menu">
+
+	<div class="container-fluid" id="pcont">
+		<div class="cl-mcont">
+
+			<!-- row start -->
+			<div class="row dash-cols">
+
+
+				<div class="col-sm-6 col-md-6 col-lg-6">
+					<div class="block-flat">
+						<div class="header">
+							<h5>标题信息</h5>
+							<div style="float: right;margin-top: -32px; margin-right: 10px;">
+								<button class="btn btn-sm btn-info" type="button">新建</button>
+								<button class="btn btn-sm btn-info" type="button">编辑</button>
+								<button class="btn btn-sm btn-info" type="button">删除</button>
+							</div>
+						</div>
+						<div class="content">
+							<img src="/images/menu_demo.png" width="400" />
+						</div>
+					</div>
+
+
+				</div>
+
+				<div class="col-sm-6 col-md-6 col-lg-6">
+
+
+					<div class="block-flat">
+						<div class="header">
+							<h5>表单信息</h5>
+							<div style="float: right;margin-top: -32px; margin-right: 10px;">
+								<button class="btn btn-sm btn-info" type="button">重置</button>
+								<button class="btn btn-sm btn-info" type="button">保存</button>
+							</div>
+						</div>
+						<div class="content">
+							<div class="form-horizontal" role="form">
+								<div class="form-group">
+									<label class="col-sm-2 control-label">输入框</label>
+									<div class="col-sm-8">
+										<input id="nameCn" name="nameCn" type="text" class="form-control" placeholder="请输入中文名称">
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">输入框</label>
+									<div class="col-sm-8">
+										<input id="nameEn" name="nameEn" type="text" class="form-control" placeholder="请输入英文名称">
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">下拉菜单</label>
+									<div class="col-sm-8">
+										<select class="form-control">
+											<option value="">---请选择---</option>
+										</select>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label class="col-sm-2 control-label">文本域</label>
+									<div class="col-sm-8">
+										<textarea class="form-control" style="height: 60px;" id="description" name="description" placeholder="输入任务描述"></textarea>
+									</div>
+								</div>
+								<input id="status" name=" status" type="hidden" value="0" class="form-control">
+							</div>
+						</div>
+					</div>
+
+
+				</div>
+
+			</div>
+			<!-- row end -->
+
+		</div>
+	</div>
+
+</div>
+
+
+<?
+}
+?>
+<script type="text/javascript">
+
+</script>

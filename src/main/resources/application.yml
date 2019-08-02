@@ -1,0 +1,65 @@
+server:
+  port: 58002
+  servlet:
+    context-path: /
+  tomcat:
+    basedir: D:/tmp
+
+
+beetl:
+  suffix: html
+
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost:3306/dlp_store?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    type: com.alibaba.druid.pool.DruidDataSource
+
+  http:
+    multipart:
+      max-request-size: 1000MB
+      max-file-size: 500MB
+      resolve-lazily: true
+
+  servlet:
+    multipart:
+      enabled: true
+      location: D:/tmp
+
+#mybatis
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**Mapper.xml
+  typeAliasesPackage: org.cloud.framework.model
+  global-config:
+    id-type: 0
+    db-column-underline: false
+  configuration:
+    map-underscore-to-camel-case: false
+    cache-enabled: true
+    multiple-result-sets-enabled: true
+    use-column-label: true
+    lazy-loading-enabled: true
+    default-executor-type: REUSE
+    default-statement-timeout: 25000
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+data:
+  upload:
+    file: D:/DLP/upload
+    template: D:/DLP/portal
+    logs: D:/DLP/logs
+dlp:
+  corpus:
+    train: D:/corpus/train
+    model: D:/corpus/model
+custom:
+  datasource:
+    names: write,read
+
+
+
+
+

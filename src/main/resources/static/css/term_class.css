@@ -1,0 +1,84 @@
+.header ul li:nth-child(1){background: #1239bc;}
+.menu ul li:nth-child(2){background: #1239bc;}
+.menu ul li:nth-child(2) a {color: #fff;}
+.nbsy{
+	height:auto;
+	/*height: 700px;*/
+	padding-left:10px ;
+	padding-right:10px ;
+	background: #eff4f8;
+	position: absolute
+	/*display: none;*/
+}
+.nbsy .spanhead{
+	display: inline-block;
+	margin: 30px 0 40px 0;
+	color: #6495bb;
+}
+.nbsy p{
+	margin:15px 30px 20px 0;
+}
+.nbsy input{
+	border: none;
+	width: 70px;
+	height: 30px;
+	border-radius: 4px;
+	background: #fff;
+	border: 1px solid #2a58f4;
+	color: #31478f;
+	margin: 0 7px;
+	font-size: 12px;
+	cursor: pointer;
+}
+.nbsy table{
+	/*height: 100%;*/
+	background: #fff;
+	border: 1px solid #2772d6;
+	margin-bottom: 10px;
+	padding: 30px 30px;
+	table-layout: fixed;
+}
+.nbsy table th{
+	height: 35px;
+	background: #416df9;
+	font-size: 14px;
+	color: #fff;
+
+}
+.nbsy table th input,.nbsy table tr input{
+	width: 12px;
+	height: 12px;
+	background: #fff;
+	border: 1px solid #317df5;
+	cursor: default;
+
+}
+.nbsy table tr{
+	height: 40px;
+	text-align: center;
+	font-size: 14px;
+	box-shadow: 1px 1px 4px #f1f1f1;
+}
+.nbsy table tr td{padding: 5px 0;}
+.nbsy table tr td button{
+	width: 80px;
+	height: 22px;
+	background: #fff;
+	border: 1px solid #2a58f4;
+	margin: 3px 7px;
+	font-size: 12px;
+	cursor: pointer;
+}
+#pageNum{
+	height: 60px;
+	text-align: center;
+	margin-top: -40px;
+}
+#pageNum p{display: inline-block;}
+#pageNum p  a{
+	height: 24px;
+	color: #2249ba;
+	margin: 0 10px;
+}
+#pageNum .pageNum_R input{width: 20px;height: 16px;}
+#pageNum .pageNum_R  a{ width: 20px;height: 16px; border: 1px solid #999; margin-left: 10px;color: #333;}
